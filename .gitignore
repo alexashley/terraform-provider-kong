@@ -1,0 +1,8 @@
+.idea/
+*.iml
+
+terraform-provider-kong
+
+example/.terraform
+.terraform
+terraform.tfstate

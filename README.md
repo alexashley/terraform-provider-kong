@@ -1,15 +1,14 @@
 # terraform-provider-kong
 
-A Terraform for the api gateway Kong.
+A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
-## prior art
+## development
 
-https://github.com/WeKnowSports/terraform-provider-kong
-- incomplete
-- less active
+- install Go 1.11 (this project uses [Go modules](https://github.com/golang/go/wiki/Modules#installing-and-activating-module-support))
+- install Terraform.
+- `docker-compose up --build -d` to stand up an instance of Kong 0.14 CE w/ Postgres.
+- `make build` to create the provider.
+- `make example` to run the provider against Kong.
 
-https://github.com/kevholditch/terraform-provider-kong 
-- listed in the [community providers](https://www.terraform.io/docs/providers/type/community-index.html)
-- maintainer seems responsive
-- has tests
-- seems to have all resources
+
+
