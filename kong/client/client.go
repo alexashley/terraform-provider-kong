@@ -37,11 +37,28 @@ func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string
 	return newService.Id, nil
 }
 
+func (kongClient *KongClient) DeleteService(serviceId string) (error) {
+	return kongClient.delete("/services/" + serviceId)
+}
+
+func (kongClient *KongClient) GetService(serviceId string) (*KongService, error) {
+	var service KongService
+	err := kongClient.get("/services" + serviceId, &service)
+
+	if err != nil {
+		return nil, err
+	}
+
+	service.Url = service.Protocol + service.Host + strconv.Itoa(service.Port) + service.Path
+
+	return &service, nil
+}
+
 func createNewServiceFormBody(serviceToCreate KongService) (url.Values) {
 	if serviceToCreate.Url != "" {
 		return url.Values{
 			"name": {serviceToCreate.Name},
-			"url": {serviceToCreate.Url},
+			"url":  {serviceToCreate.Url},
 		}
 	}
 
@@ -80,4 +97,42 @@ func (kongClient *KongClient) postForm(path string, form url.Values, responseRes
 	}
 
 	return json.Unmarshal(body, responseResource)
+}
+
+func (kongClient *KongClient) get(path string, responseResource interface{}) error {
+	endpoint := kongClient.AdminApiUrl + path
+
+	response, err := kongClient.client.Get(endpoint)
+
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, responseResource)
+}
+
+func (kongClient *KongClient) delete(path string) error {
+	endpoint := kongClient.AdminApiUrl + path
+
+	request, err := http.NewRequest("DELETE", endpoint, nil)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = kongClient.client.Do(request)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

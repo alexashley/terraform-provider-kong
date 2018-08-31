@@ -67,6 +67,22 @@ func resourceKongServiceCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKongServiceRead(d *schema.ResourceData, meta interface{}) error {
+	kongClient := meta.(*client.KongClient)
+
+	service, err := kongClient.GetService(d.Id())
+
+	if err != nil {
+		d.SetId("")
+		return nil
+	}
+
+	d.Set("name", service.Name)
+	d.Set("protocol", service.Protocol)
+	d.Set("host", service.Host)
+	d.Set("port", service.Port)
+	d.Set("path", service.Path)
+	d.Set("url", service.Url)
+
 	return nil
 }
 
@@ -75,5 +91,7 @@ func resourceKongServiceUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKongServiceDelete(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	kongClient := meta.(*client.KongClient)
+
+	return kongClient.DeleteService(d.Id())
 }
