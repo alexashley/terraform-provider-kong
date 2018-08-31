@@ -1,17 +1,18 @@
 package provider
 
 import (
+	"github.com/alexashley/terraform-provider-kong/kong/client"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-type KongService struct {
-	id       string
-	name     string
-	protocol string
-	host     string
-	port     int
-	path     string
-}
+//type KongService struct {
+//	id       string
+//	name     string
+//	protocol string
+//	host     string
+//	port     int
+//	path     string
+//}
 
 func resourceKongService() *schema.Resource {
 	return &schema.Resource{
@@ -62,21 +63,18 @@ func resourceKongService() *schema.Resource {
 	}
 }
 
-//resp, err := http.PostForm("http://example.com/form",
-//url.Values{"key": {"Value"}, "id": {"123"}}
-
 func resourceKongServiceCreate(d *schema.ResourceData, meta interface{}) error {
-	kong := meta.(*Kong)
+	kongClient := meta.(*client.KongClient)
 
-	kongService := KongService{
-		name:     d.Get("name").(string),
-		protocol: d.Get("protocol").(string),
-		host:     d.Get("host").(string),
-		port:     d.Get("port").(int),
-		path:     d.Get("path").(string),
+	kongService := client.KongService{
+		Name:     d.Get("name").(string),
+		Protocol: d.Get("protocol").(string),
+		Host:     d.Get("host").(string),
+		Port:     d.Get("port").(int),
+		Path:     d.Get("path").(string),
 	}
 
-	id, err := kong.createService(kongService)
+	id, err := kongClient.CreateService(kongService)
 
 	if err != nil {
 		return err

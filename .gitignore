@@ -6,3 +6,4 @@ terraform-provider-kong
 example/.terraform
 .terraform
 terraform.tfstate
+terraform.tfstate.backup

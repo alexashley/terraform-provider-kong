@@ -11,7 +11,7 @@ services:
     depends_on:
     - kong-database
     build:
-      context: kong
+      context: kong-docker
     ports:
     - 8001:8001
     - 8000:8000

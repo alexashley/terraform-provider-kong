@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"github.com/alexashley/terraform-provider-kong/kong/client"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -19,7 +20,7 @@ func KongProvider() *schema.Provider {
 		ConfigureFunc: func(data *schema.ResourceData) (interface{}, error) {
 			adminApiUrl := data.Get("admin_api_url").(string)
 
-			return NewKongClient(adminApiUrl)
+			return client.NewKongClient(adminApiUrl)
 		},
 	}
 }
