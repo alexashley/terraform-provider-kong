@@ -7,6 +7,6 @@ build:
 	 GO111MODULE=on go build -o terraform-provider-kong
 
 tf-example: build
-	terraform destroy example
 	terraform init example
+	terraform destroy example
 	terraform apply example

@@ -25,13 +25,7 @@ func NewKongClient(adminApiUrl string) (*KongClient, error) {
 }
 
 func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string, error) {
-	servicePayload := url.Values{
-		"name":     {serviceToCreate.Name},
-		"protocol": {serviceToCreate.Protocol},
-		"host":     {serviceToCreate.Host},
-		"port":     {strconv.Itoa(serviceToCreate.Port)},
-		"path":     {serviceToCreate.Path},
-	}
+	servicePayload := createNewServiceFormBody(serviceToCreate)
 
 	var newService KongService
 	err := kongClient.postForm("/services", servicePayload, &newService)
@@ -41,6 +35,23 @@ func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string
 	}
 
 	return newService.Id, nil
+}
+
+func createNewServiceFormBody(serviceToCreate KongService) (url.Values) {
+	if serviceToCreate.Url != "" {
+		return url.Values{
+			"name": {serviceToCreate.Name},
+			"url": {serviceToCreate.Url},
+		}
+	}
+
+	return url.Values{
+		"name":     {serviceToCreate.Name},
+		"protocol": {serviceToCreate.Protocol},
+		"host":     {serviceToCreate.Host},
+		"port":     {strconv.Itoa(serviceToCreate.Port)},
+		"path":     {serviceToCreate.Path},
+	}
 }
 
 func (kongClient *KongClient) postForm(path string, form url.Values, responseResource interface{}) error {

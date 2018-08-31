@@ -9,3 +9,8 @@ resource "kong_service" "mockbin-service" {
   port = 80
   path = "/request"
 }
+
+resource "kong_service" "service-from-url" {
+  name = "service-from-url",
+  url = "https://foobar.org:8080/test"
+}

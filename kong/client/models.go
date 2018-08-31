@@ -13,6 +13,7 @@ type KongService struct {
 	Retries        int
 	ReadTimeout    int
 	WriteTimeout   int
+	Url            string
 }
 
 type KongServiceReference struct {

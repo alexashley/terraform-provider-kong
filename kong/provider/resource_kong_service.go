@@ -14,23 +14,30 @@ func resourceKongService() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"host": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: false,
+				Optional: true,
 			},
 			"path": &schema.Schema{
+				Default:  "",
 				Type:     schema.TypeString,
-				Required: false,
+				Optional: true,
 			},
 			"protocol": &schema.Schema{
+				Default: "http",
 				Type:     schema.TypeString,
-				Required: false,
+				Optional: true,
 			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			"port": &schema.Schema{
+				Default: 80,
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
+			},
+			"url": &schema.Schema{
+				Type: schema.TypeString,
+				Optional: true,
 			},
 		},
 	}
@@ -45,6 +52,7 @@ func resourceKongServiceCreate(d *schema.ResourceData, meta interface{}) error {
 		Host:     d.Get("host").(string),
 		Port:     d.Get("port").(int),
 		Path:     d.Get("path").(string),
+		Url:	  d.Get("url").(string),
 	}
 
 	id, err := kongClient.CreateService(kongService)
