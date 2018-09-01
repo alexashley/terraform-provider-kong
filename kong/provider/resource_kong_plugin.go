@@ -30,7 +30,7 @@ func resourceKongPlugin() *schema.Resource {
 			},
 			"config": &schema.Schema{
 				Type: schema.TypeMap,
-				Elem: &schema.Schema{ // TODO: flesh this out or prove that this works for different plugins
+				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
@@ -40,31 +40,31 @@ func resourceKongPlugin() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
-			//"created_at": &schema.Schema{
-			//	Type:     schema.TypeInt,
-			//	Computed: true,
-			//},
+			"created_at": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
 
 func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
-	// TODO: change this to return the whole object so all computed properties can be set
-	id, err := kongClient.CreatePlugin(client.KongPlugin{
-		ServiceId: data.Get("service_id").(string),
-		RouteId: data.Get("route_id").(string),
+	plugin, err := kongClient.CreatePlugin(client.KongPlugin{
+		ServiceId:  data.Get("service_id").(string),
+		RouteId:    data.Get("route_id").(string),
 		ConsumerId: data.Get("consumer_id").(string),
-		Name: data.Get("name").(string),
-		Config: data.Get("config").(map[string]interface{}),
-		Enabled: data.Get("enabled").(bool),
+		Name:       data.Get("name").(string),
+		Config:     data.Get("config").(map[string]interface{}),
+		Enabled:    data.Get("enabled").(bool),
 	})
 
 	if err != nil {
 		return err
 	}
 
-	data.SetId(id)
+	data.SetId(plugin.Id)
+	data.Set("created_at", plugin.CreatedAt)
 
 	return nil
 }

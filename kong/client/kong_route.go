@@ -2,15 +2,15 @@ package client
 
 const routePath = "/routes"
 
-func (kongClient *KongClient) CreateRoute(routeToCreate KongRoute) (string, error) {
+func (kongClient *KongClient) CreateRoute(routeToCreate KongRoute) (*KongRoute, error) {
 	var newRoute KongRoute
 	err := kongClient.postJson(routePath, routeToCreate, &newRoute)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return newRoute.Id, nil
+	return &newRoute, nil
 }
 
 func (kongClient *KongClient) DeleteRoute(routeId string) error {

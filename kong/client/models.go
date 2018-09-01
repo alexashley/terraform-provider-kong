@@ -15,10 +15,10 @@ type KongService struct {
 	// However, in the interest of a consistent model, this package only exposes a url field, for both reading and writing.
 	// The other fields (protocol, host, port, path) are in the struct only so that the url field can be populated.
 	Url      string `json:"url,omitempty"`
-	protocol string
-	host     string
-	port     int
-	path     string
+	Protocol string `json:"protocol,omitempty"`
+	Host     string `json:"host,omitempty"`
+	Port     int    `json:"port,omitempty"`
+	Path     string `json:"path,omitempty"`
 }
 
 type KongServiceReference struct {

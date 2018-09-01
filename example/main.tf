@@ -11,8 +11,7 @@ resource "kong_route" "mock" {
   service = {
     id = "${kong_service.mockbin.id}"
   },
-  paths = [
-    "/mock"]
+  paths = ["/mock"]
 }
 
 resource "kong_plugin" "response_transformer_plugin_route" {

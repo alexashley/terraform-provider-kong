@@ -1,20 +1,18 @@
 package client
 
-import (
-	"strconv"
-)
+import "strconv"
 
 const servicesPath = "/services"
 
-func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string, error) {
+func (kongClient *KongClient) CreateService(serviceToCreate KongService) (*KongService, error) {
 	var newService KongService
 	err := kongClient.postJson(servicesPath, serviceToCreate, &newService)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return newService.Id, nil
+	return &newService, nil
 }
 
 func (kongClient *KongClient) DeleteService(serviceId string) error {
@@ -29,11 +27,28 @@ func (kongClient *KongClient) GetService(serviceId string) (*KongService, error)
 		return nil, err
 	}
 
-	service.Url = service.protocol + service.host + strconv.Itoa(service.port) + service.path
+	service.Url = service.getUrlFromParts()
 
 	return &service, nil
 }
 
 func servicePath(serviceId string) string {
 	return servicesPath + "/" + serviceId
+}
+
+func (kongService *KongService) getUrlFromParts() string {
+	port := kongService.Port
+
+	protocol := kongService.Protocol
+	url := protocol + "://" + kongService.Host
+
+	if shouldIncludePortInUrl(protocol, port) {
+		url += ":" + strconv.Itoa(port)
+	}
+
+	return url + kongService.Path
+}
+
+func shouldIncludePortInUrl(protocol string, port int) bool {
+	return !(protocol == "https" && port == 443 || protocol == "http" && port == 80)
 }

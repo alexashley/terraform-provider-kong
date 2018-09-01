@@ -57,6 +57,19 @@ func resourceKongRoute() *schema.Resource {
 				},
 				Required: true,
 			},
+			"created_at": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"updated_at": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"regex_priority": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
 		},
 	}
 }
@@ -65,7 +78,7 @@ func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error 
 	kongClient := meta.(*client.KongClient)
 
 	associatedService := toStringMap(data.Get("service").(map[string]interface{}))
-	id, err := kongClient.CreateRoute(client.KongRoute{
+	route, err := kongClient.CreateRoute(client.KongRoute{
 		Methods:      toStringArray(data.Get("methods").([]interface{})),
 		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
 		Hosts:        toStringArray(data.Get("hosts").([]interface{})),
@@ -81,7 +94,9 @@ func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	data.SetId(id)
+	data.SetId(route.Id)
+	data.Set("created_at", route.CreatedAt)
+	data.Set("updated_at", route.UpdatedAt)
 
 	return nil
 }
