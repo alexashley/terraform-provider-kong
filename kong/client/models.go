@@ -40,11 +40,12 @@ type KongRoute struct {
 }
 
 type KongPlugin struct {
-	Id         string
-	ServiceId  string
-	ConsumerId string
-	Name       string
-	Config     map[string]interface{}
-	Enabled    bool
-	CreatedAt  int64
+	Id         string                 `json:"id,omitempty"`
+	ServiceId  string                 `json:"service_id,omitempty"`
+	RouteId    string                 `json:"route_id,omitempty"`
+	ConsumerId string                 `json:"consumer_id,omitempty"`
+	Name       string                 `json:"name,omitempty"`
+	Config     map[string]interface{} `json:"config,omitempty"`
+	Enabled    bool                   `json:"enabled,omitempty"`
+	CreatedAt  int64                  `json:"created_at,omitempty"`
 }

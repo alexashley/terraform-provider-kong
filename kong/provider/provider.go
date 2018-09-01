@@ -10,6 +10,7 @@ func KongProvider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"kong_service": resourceKongService(),
 			"kong_route":   resourceKongRoute(),
+			"kong_plugin":  resourceKongPlugin(),
 		},
 		Schema: map[string]*schema.Schema{
 			"admin_api_url": {

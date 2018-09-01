@@ -18,7 +18,6 @@ func resourceKongRoute() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Optional: true,
-				//Default: []string {"http", "https"},
 			},
 			"methods": &schema.Schema{
 				Type: schema.TypeList,
