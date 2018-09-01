@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 )
 
@@ -31,34 +29,6 @@ func NewKongClient(config KongConfig) (*KongClient, error) {
 	}
 
 	return &KongClient{Config: config, client: httpClient}, nil
-}
-
-func (kongClient *KongClient) postForm(path string, form url.Values, responseResource interface{}) error {
-	endpoint := kongClient.Config.AdminApiUrl + path
-
-	request, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
-
-	if err != nil {
-		return err
-	}
-
-	kongClient.addDefaultHeaders(request)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	response, err := kongClient.client.Do(request)
-
-	if err != nil {
-		return err
-	}
-
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, responseResource)
 }
 
 func (kongClient *KongClient) postJson(path string, payload interface{}, responseResource interface{}) error {

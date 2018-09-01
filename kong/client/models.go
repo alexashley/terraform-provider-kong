@@ -1,19 +1,24 @@
 package client
 
 type KongService struct {
-	Id             string
-	CreatedAt      int64
-	UpdatedAt      int64
-	ConnectTimeout int
-	Name           string
-	Protocol       string
-	Host           string
-	Port           int
-	Path           string
-	Retries        int
-	ReadTimeout    int
-	WriteTimeout   int
-	Url            string
+	Id             string `json:"id,omitempty"`
+	CreatedAt      int64  `json:"created_at,omitempty"`
+	UpdatedAt      int64  `json:"updated_at,omitempty"`
+	ConnectTimeout int    `json:"connect_timeout,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Retries        int    `json:"retries,omitempty"`
+	ReadTimeout    int    `json:"read_timeout,omitempty"`
+	WriteTimeout   int    `json:"write_timeout,omitempty"`
+
+	// Kong's api treats `url` as a write-only property.
+	// This is useful for creating or updating a service (simply supply the url instead of four other fields),
+	// However, in the interest of a consistent model, this package only exposes a url field, for both reading and writing.
+	// The other fields (protocol, host, port, path) are in the struct only so that the url field can be populated.
+	Url      string `json:"url,omitempty"`
+	protocol string
+	host     string
+	port     int
+	path     string
 }
 
 type KongServiceReference struct {

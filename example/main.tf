@@ -4,10 +4,7 @@ provider "kong" {
 
 resource "kong_service" "mockbin_service" {
   name = "mockbin"
-  protocol = "http"
-  host = "mockbin.org"
-  port = 80
-  path = "/request"
+  url = "https://mockbin.org/request"
 }
 
 resource "kong_route" "mock" {
@@ -15,9 +12,4 @@ resource "kong_route" "mock" {
     id = "${kong_service.mockbin_service.id}"
   },
   paths = ["/mock"]
-}
-
-resource "kong_service" "service_from_url" {
-  name = "service-from-url",
-  url = "https://foobar.org:8080/test"
 }

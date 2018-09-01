@@ -1,17 +1,14 @@
 package client
 
 import (
-	"net/url"
 	"strconv"
 )
 
 const servicesPath = "/services"
 
 func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string, error) {
-	servicePayload := createNewServiceFormBody(serviceToCreate)
-
 	var newService KongService
-	err := kongClient.postForm(servicesPath, servicePayload, &newService)
+	err := kongClient.postJson(servicesPath, serviceToCreate, &newService)
 
 	if err != nil {
 		return "", err
@@ -32,26 +29,9 @@ func (kongClient *KongClient) GetService(serviceId string) (*KongService, error)
 		return nil, err
 	}
 
-	service.Url = service.Protocol + service.Host + strconv.Itoa(service.Port) + service.Path
+	service.Url = service.protocol + service.host + strconv.Itoa(service.port) + service.path
 
 	return &service, nil
-}
-
-func createNewServiceFormBody(serviceToCreate KongService) url.Values {
-	if serviceToCreate.Url != "" {
-		return url.Values{
-			"name": {serviceToCreate.Name},
-			"url":  {serviceToCreate.Url},
-		}
-	}
-
-	return url.Values{
-		"name":     {serviceToCreate.Name},
-		"protocol": {serviceToCreate.Protocol},
-		"host":     {serviceToCreate.Host},
-		"port":     {strconv.Itoa(serviceToCreate.Port)},
-		"path":     {serviceToCreate.Path},
-	}
 }
 
 func servicePath(serviceId string) string {
