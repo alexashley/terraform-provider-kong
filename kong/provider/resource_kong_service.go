@@ -22,7 +22,7 @@ func resourceKongService() *schema.Resource {
 				Optional: true,
 			},
 			"protocol": &schema.Schema{
-				Default: "http",
+				Default:  "http",
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -31,28 +31,28 @@ func resourceKongService() *schema.Resource {
 				Required: true,
 			},
 			"port": &schema.Schema{
-				Default: 80,
+				Default:  80,
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 			"url": &schema.Schema{
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 		},
 	}
 }
 
-func resourceKongServiceCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
 	kongService := client.KongService{
-		Name:     d.Get("name").(string),
-		Protocol: d.Get("protocol").(string),
-		Host:     d.Get("host").(string),
-		Port:     d.Get("port").(int),
-		Path:     d.Get("path").(string),
-		Url:	  d.Get("url").(string),
+		Name:     data.Get("name").(string),
+		Protocol: data.Get("protocol").(string),
+		Host:     data.Get("host").(string),
+		Port:     data.Get("port").(int),
+		Path:     data.Get("path").(string),
+		Url:      data.Get("url").(string),
 	}
 
 	id, err := kongClient.CreateService(kongService)
@@ -61,7 +61,7 @@ func resourceKongServiceCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(id)
+	data.SetId(id)
 
 	return nil
 }

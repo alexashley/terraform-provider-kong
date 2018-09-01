@@ -17,20 +17,21 @@ type KongService struct {
 }
 
 type KongServiceReference struct {
-	Id string
+	Id string `json:"id"`
 }
 
 type KongRoute struct {
-	Id            string
-	CreatedAt     int64
-	UpdatedAt     int64
-	Protocols     []string
-	Methods       []string
-	Hosts         []string
-	Paths         []string
-	RegexPriority int
-	StripPath     bool
-	Service       KongServiceReference
+	Id            string               `json:"id,omitempty"`
+	CreatedAt     int64                `json:"created_at,omitempty"`
+	UpdatedAt     int64                `json:"updated_at,omitempty"`
+	Protocols     []string             `json:"protocols,omitempty"`
+	Methods       []string             `json:"methods,omitempty"`
+	Hosts         []string             `json:"hosts,omitempty"`
+	Paths         []string             `json:"paths,omitempty"`
+	RegexPriority int                  `json:"regex_priority"`
+	StripPath     bool                 `json:"strip_path"`
+	PreserveHost  bool                 `json:"preserve_host"`
+	Service       KongServiceReference `json:"service"`
 }
 
 type KongPlugin struct {

@@ -1,78 +1,40 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 )
 
-type KongClient struct {
+const (
+	rbacHeader = "Kong-Admin-Token"
+)
+
+type KongConfig struct {
 	AdminApiUrl string
+	RbacToken   string
+}
+
+type KongClient struct {
+	Config KongConfig
 
 	client *http.Client
 }
 
-func NewKongClient(adminApiUrl string) (*KongClient, error) {
+func NewKongClient(config KongConfig) (*KongClient, error) {
 	httpClient := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
-	return &KongClient{AdminApiUrl: adminApiUrl, client: httpClient}, nil
-}
-
-func (kongClient *KongClient) CreateService(serviceToCreate KongService) (string, error) {
-	servicePayload := createNewServiceFormBody(serviceToCreate)
-
-	var newService KongService
-	err := kongClient.postForm("/services", servicePayload, &newService)
-
-	if err != nil {
-		return "", err
-	}
-
-	return newService.Id, nil
-}
-
-func (kongClient *KongClient) DeleteService(serviceId string) (error) {
-	return kongClient.delete("/services/" + serviceId)
-}
-
-func (kongClient *KongClient) GetService(serviceId string) (*KongService, error) {
-	var service KongService
-	err := kongClient.get("/services" + serviceId, &service)
-
-	if err != nil {
-		return nil, err
-	}
-
-	service.Url = service.Protocol + service.Host + strconv.Itoa(service.Port) + service.Path
-
-	return &service, nil
-}
-
-func createNewServiceFormBody(serviceToCreate KongService) (url.Values) {
-	if serviceToCreate.Url != "" {
-		return url.Values{
-			"name": {serviceToCreate.Name},
-			"url":  {serviceToCreate.Url},
-		}
-	}
-
-	return url.Values{
-		"name":     {serviceToCreate.Name},
-		"protocol": {serviceToCreate.Protocol},
-		"host":     {serviceToCreate.Host},
-		"port":     {strconv.Itoa(serviceToCreate.Port)},
-		"path":     {serviceToCreate.Path},
-	}
+	return &KongClient{Config: config, client: httpClient}, nil
 }
 
 func (kongClient *KongClient) postForm(path string, form url.Values, responseResource interface{}) error {
-	endpoint := kongClient.AdminApiUrl + path
+	endpoint := kongClient.Config.AdminApiUrl + path
 
 	request, err := http.NewRequest("POST", endpoint, strings.NewReader(form.Encode()))
 
@@ -80,7 +42,7 @@ func (kongClient *KongClient) postForm(path string, form url.Values, responseRes
 		return err
 	}
 
-	request.Header.Set("Accept", "application/json")
+	kongClient.addDefaultHeaders(request)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response, err := kongClient.client.Do(request)
@@ -99,10 +61,52 @@ func (kongClient *KongClient) postForm(path string, form url.Values, responseRes
 	return json.Unmarshal(body, responseResource)
 }
 
-func (kongClient *KongClient) get(path string, responseResource interface{}) error {
-	endpoint := kongClient.AdminApiUrl + path
+func (kongClient *KongClient) postJson(path string, payload interface{}, responseResource interface{}) error {
+	endpoint := kongClient.Config.AdminApiUrl + path
 
-	response, err := kongClient.client.Get(endpoint)
+	serializedPayload, err := json.Marshal(payload)
+
+	if err != nil {
+		return err
+	}
+
+	request, err := http.NewRequest("POST", endpoint, bytes.NewReader(serializedPayload))
+
+	if err != nil {
+		return err
+	}
+
+	kongClient.addDefaultHeaders(request)
+	request.Header.Set("Content-Type", "application/json")
+
+	response, err := kongClient.client.Do(request)
+
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, responseResource)
+}
+
+func (kongClient *KongClient) get(path string, responseResource interface{}) error {
+	endpoint := kongClient.Config.AdminApiUrl + path
+	request, err := http.NewRequest("GET", endpoint, nil)
+
+	if err != nil {
+		return err
+	}
+
+	kongClient.addDefaultHeaders(request)
+
+	response, err := kongClient.client.Do(request)
 
 	if err != nil {
 		return err
@@ -120,7 +124,7 @@ func (kongClient *KongClient) get(path string, responseResource interface{}) err
 }
 
 func (kongClient *KongClient) delete(path string) error {
-	endpoint := kongClient.AdminApiUrl + path
+	endpoint := kongClient.Config.AdminApiUrl + path
 
 	request, err := http.NewRequest("DELETE", endpoint, nil)
 
@@ -135,4 +139,12 @@ func (kongClient *KongClient) delete(path string) error {
 	}
 
 	return nil
+}
+
+func (kongClient *KongClient) addDefaultHeaders(request *http.Request) {
+	if kongClient.Config.RbacToken != "" {
+		request.Header.Set(rbacHeader, kongClient.Config.RbacToken)
+	}
+
+	request.Header.Set("Accept", "application/json")
 }
