@@ -66,32 +66,32 @@ func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func resourceKongServiceRead(d *schema.ResourceData, meta interface{}) error {
+func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	service, err := kongClient.GetService(d.Id())
+	service, err := kongClient.GetService(data.Id())
 
 	if err != nil {
-		d.SetId("")
+		data.SetId("")
 		return nil
 	}
 
-	d.Set("name", service.Name)
-	d.Set("protocol", service.Protocol)
-	d.Set("host", service.Host)
-	d.Set("port", service.Port)
-	d.Set("path", service.Path)
-	d.Set("url", service.Url)
+	data.Set("name", service.Name)
+	data.Set("protocol", service.Protocol)
+	data.Set("host", service.Host)
+	data.Set("port", service.Port)
+	data.Set("path", service.Path)
+	data.Set("url", service.Url)
 
 	return nil
 }
 
-func resourceKongServiceUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceKongServiceUpdate(data *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceKongServiceDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceKongServiceDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	return kongClient.DeleteService(d.Id())
+	return kongClient.DeleteService(data.Id())
 }
