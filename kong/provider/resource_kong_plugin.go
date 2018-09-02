@@ -66,10 +66,26 @@ func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error
 	data.SetId(plugin.Id)
 	data.Set("created_at", plugin.CreatedAt)
 
-	return nil
+	return resourceKongRouteRead(data, meta)
 }
 
 func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
+	kongClient := meta.(*client.KongClient)
+
+	plugin, err := kongClient.GetPlugin(data.Id())
+
+	if err != nil {
+		data.SetId("")
+		return nil
+	}
+
+	data.Set("service_id", plugin.ServiceId)
+	data.Set("route_id", plugin.RouteId)
+	data.Set("consumer_id", plugin.ConsumerId)
+	data.Set("name", plugin.Name)
+	data.Set("enabled", plugin.Enabled)
+	data.Set("created_at", plugin.CreatedAt)
+
 	return nil
 }
 
@@ -78,5 +94,7 @@ func resourceKongPluginUpdate(data *schema.ResourceData, meta interface{}) error
 }
 
 func resourceKongPluginDelete(data *schema.ResourceData, meta interface{}) error {
-	return nil
+	kongClient := meta.(*client.KongClient)
+
+	return kongClient.DeletePlugin(data.Id())
 }

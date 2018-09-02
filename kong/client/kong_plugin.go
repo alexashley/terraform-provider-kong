@@ -17,3 +17,14 @@ func (kongClient *KongClient) CreatePlugin(pluginToCreate KongPlugin) (*KongPlug
 func (kongClient *KongClient) DeletePlugin(pluginId string) error {
 	return kongClient.delete(pluginPath + "/" + pluginId)
 }
+
+func (kongClient *KongClient) GetPlugin(pluginId string) (*KongPlugin, error) {
+	var kongPlugin KongPlugin
+	err := kongClient.get(pluginPath+"/"+pluginId, &kongPlugin)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &kongPlugin, nil
+}
