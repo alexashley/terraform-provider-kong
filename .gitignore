@@ -1,10 +1,11 @@
 .idea/
 *.iml
 
+*.log
+
 terraform-provider-kong
 
 example/.terraform
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
-crash.log

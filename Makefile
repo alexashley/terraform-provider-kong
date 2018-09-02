@@ -10,3 +10,4 @@ tf-example: build
 	terraform init example
 	terraform destroy example
 	terraform apply example
+	terraform plan example

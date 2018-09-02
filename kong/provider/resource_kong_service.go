@@ -55,9 +55,6 @@ func resourceKongService() *schema.Resource {
 func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	//serviceUrl := data.Get("url").(string)
-	//data.Set("url", serviceUrl)
-
 	kongService := client.KongService{
 		Name:           data.Get("name").(string),
 		Url:            data.Get("url").(string),
@@ -74,10 +71,8 @@ func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) erro
 	}
 
 	data.SetId(service.Id)
-	data.Set("created_at", service.CreatedAt)
-	data.Set("updated_at", service.UpdatedAt)
 
-	return nil
+	return resourceKongServiceRead(data, meta)
 }
 
 func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error {

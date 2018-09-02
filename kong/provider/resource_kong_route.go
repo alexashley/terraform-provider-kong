@@ -17,7 +17,11 @@ func resourceKongRoute() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				DefaultFunc: func() (interface{}, error) {
+					return []string{"http", "https"}, nil
+				},
 				Optional: true,
+				Computed: true,
 			},
 			"methods": &schema.Schema{
 				Type: schema.TypeList,
@@ -95,13 +99,31 @@ func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error 
 	}
 
 	data.SetId(route.Id)
-	data.Set("created_at", route.CreatedAt)
-	data.Set("updated_at", route.UpdatedAt)
 
-	return nil
+	return resourceKongRouteRead(data, meta)
 }
 
 func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
+	kongClient := meta.(*client.KongClient)
+
+	route, err := kongClient.GetRoute(data.Id())
+
+	if err != nil {
+		data.SetId("")
+		return nil
+	}
+
+	data.Set("hosts", route.Hosts)
+	data.Set("protocols", route.Protocols)
+	data.Set("methods", route.Methods)
+	data.Set("paths", route.Paths)
+	data.Set("strip_path", route.StripPath)
+	data.Set("preserve_hosts", route.PreserveHost)
+	data.Set("service", route.Service)
+	data.Set("created_at", route.CreatedAt)
+	data.Set("updated_at", route.UpdatedAt)
+	data.Set("regex_priority", route.RegexPriority)
+
 	return nil
 }
 

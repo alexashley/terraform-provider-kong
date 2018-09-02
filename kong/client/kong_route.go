@@ -13,6 +13,17 @@ func (kongClient *KongClient) CreateRoute(routeToCreate KongRoute) (*KongRoute, 
 	return &newRoute, nil
 }
 
+func (kongClient *KongClient) GetRoute(routeId string) (*KongRoute, error) {
+	var route KongRoute
+	err := kongClient.get(routePath+"/"+routeId, &route)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &route, nil
+}
+
 func (kongClient *KongClient) DeleteRoute(routeId string) error {
 	return kongClient.delete(routePath + "/" + routeId)
 }
