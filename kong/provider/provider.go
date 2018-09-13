@@ -8,9 +8,10 @@ import (
 func KongProvider() *schema.Provider {
 	return &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
-			"kong_service": resourceKongService(),
-			"kong_route":   resourceKongRoute(),
-			"kong_plugin":  resourceKongPlugin(),
+			"kong_service":                      resourceKongService(),
+			"kong_route":                        resourceKongRoute(),
+			"kong_plugin":                       resourceKongPlugin(),
+			"kong_plugin_ip_header_restriction": resourceKongPluginIpHeaderRestriction(),
 		},
 		Schema: map[string]*schema.Schema{
 			"admin_api_url": {

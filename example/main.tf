@@ -8,11 +8,12 @@ resource "kong_service" "mockbin" {
 }
 
 resource "kong_route" "mock" {
-  service_id ="${kong_service.mockbin.id}"
-  paths = ["/mock"]
+  service_id = "${kong_service.mockbin.id}"
+  paths = [
+    "/mock"]
 }
 
-resource "kong_plugin" "response_transformer_plugin_route" {
+resource "kong_plugin" "response-transformer-plugin-route" {
   route_id = "${kong_route.mock.id}"
   name = "response-transformer"
   config = {
@@ -42,4 +43,17 @@ resource "kong_route" "child-route-test-count" {
   count = "${var.test-count-enabled == "yes" ? 1 : 0}"
 
   service_id = "${kong_service.test-count-service.id}"
+}
+
+resource "kong_plugin_ip_header_restriction" "global-ip-header-restriction" {
+  whitelist = [
+    "230.188.209.188",
+    "141.201.15.252",
+    "142.121.207.218"
+  ]
+}
+
+resource "kong_plugin_ip_header_restriction" "route-ip-header-restriction" {
+  route_id = "${kong_route.mock.id}"
+  whitelist = ["181.28.140.88"]
 }
