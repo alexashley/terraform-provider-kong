@@ -22,3 +22,28 @@ resource "kong_plugin" "response_transformer_plugin_route" {
     add.headers = "x-parent-resource:route"
   }
 }
+
+variable "test-count-enabled" {
+  default = "no"
+  type = "string"
+}
+
+resource "kong_service" "test-count-service" {
+  count = "${var.test-count-enabled == "yes" ? 1 : 0}"
+
+  name = "foo"
+  url = "http://foo.bar.org"
+}
+
+resource "kong_route" "child-route-test-count" {
+  /*
+    Need to set count for dependent resources of a conditional resource,
+    otherwise TF will error:
+    Resource 'kong_service.test-count-service' not found for variable 'kong_service.test-count-service.id'
+  */
+  count = "${var.test-count-enabled == "yes" ? 1 : 0}"
+
+  service = {
+    id = "${kong_service.test-count-service.id}"
+  }
+}
