@@ -55,7 +55,7 @@ func resourceKongRoute() *schema.Resource {
 				Default:  false,
 			},
 			"service_id": &schema.Schema{
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"created_at": &schema.Schema{
@@ -131,14 +131,4 @@ func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error 
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeleteRoute(data.Id())
-}
-
-func toStringArray(data []interface{}) []string {
-	result := make([]string, len(data))
-
-	for index, value := range data {
-		result[index] = value.(string)
-	}
-
-	return result
 }
