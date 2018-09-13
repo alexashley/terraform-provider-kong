@@ -8,9 +8,7 @@ resource "kong_service" "mockbin" {
 }
 
 resource "kong_route" "mock" {
-  service = {
-    id = "${kong_service.mockbin.id}"
-  },
+  service_id ="${kong_service.mockbin.id}"
   paths = ["/mock"]
 }
 
@@ -43,7 +41,5 @@ resource "kong_route" "child-route-test-count" {
   */
   count = "${var.test-count-enabled == "yes" ? 1 : 0}"
 
-  service = {
-    id = "${kong_service.test-count-service.id}"
-  }
+  service_id = "${kong_service.test-count-service.id}"
 }

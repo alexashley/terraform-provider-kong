@@ -54,11 +54,8 @@ func resourceKongRoute() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"service": &schema.Schema{
-				Type: schema.TypeMap,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+			"service_id": &schema.Schema{
+				Type: schema.TypeString,
 				Required: true,
 			},
 			"created_at": &schema.Schema{
@@ -81,7 +78,6 @@ func resourceKongRoute() *schema.Resource {
 func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	associatedService := toStringMap(data.Get("service").(map[string]interface{}))
 	route, err := kongClient.CreateRoute(client.KongRoute{
 		Methods:      toStringArray(data.Get("methods").([]interface{})),
 		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
@@ -90,7 +86,7 @@ func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error 
 		StripPath:    data.Get("strip_path").(bool),
 		PreserveHost: data.Get("preserve_host").(bool),
 		Service: client.KongServiceReference{
-			Id: associatedService["id"],
+			Id: data.Get("service_id").(string),
 		},
 	})
 
@@ -119,7 +115,7 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 	data.Set("paths", route.Paths)
 	data.Set("strip_path", route.StripPath)
 	data.Set("preserve_hosts", route.PreserveHost)
-	data.Set("service", route.Service)
+	data.Set("service_id", route.Service.Id)
 	data.Set("created_at", route.CreatedAt)
 	data.Set("updated_at", route.UpdatedAt)
 	data.Set("regex_priority", route.RegexPriority)
@@ -135,16 +131,6 @@ func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error 
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeleteRoute(data.Id())
-}
-
-func toStringMap(data map[string]interface{}) map[string]string {
-	result := make(map[string]string)
-
-	for key, value := range data {
-		result[key] = value.(string)
-	}
-
-	return result
 }
 
 func toStringArray(data []interface{}) []string {
