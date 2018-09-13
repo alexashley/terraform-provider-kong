@@ -64,7 +64,6 @@ func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error
 	}
 
 	data.SetId(plugin.Id)
-	data.Set("created_at", plugin.CreatedAt)
 
 	return resourceKongRouteRead(data, meta)
 }
@@ -85,6 +84,7 @@ func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
 	data.Set("name", plugin.Name)
 	data.Set("enabled", plugin.Enabled)
 	data.Set("created_at", plugin.CreatedAt)
+	data.Set("config", plugin.Config)
 
 	return nil
 }
