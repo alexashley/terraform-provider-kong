@@ -12,9 +12,9 @@ A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
 ### Manually testing imported resources
 
-Run `./examples/import/create-resources.sh` to create an example service, route, and a few plugins.
-Then `terraform import -config=examples/import <resource>.<resource-name> <UUID>` should import the resource (ex: `terraform import -config=examples/import kong_service.service-to-import e86f981e-a580-4bd6-aef3-1324adfcc12c`).
-Afterwards `terraform destroy examples/import` will remove the resources.
+- Run `./examples/import/create-resources.sh` to create an example service, route, and a few plugins.
+- Then `terraform import -config=examples/import <resource>.<resource-name> <UUID>` should import the resource (ex: `terraform import -config=examples/import kong_service.service-to-import e86f981e-a580-4bd6-aef3-1324adfcc12c`).
+- Afterwards `terraform destroy examples/import` will remove the resources.
 
 ## Resources
 
