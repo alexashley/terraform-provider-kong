@@ -18,10 +18,7 @@ jobs:
         command: |
           for i in `seq 1 10`;
           do
-            nc -z localhost 5432 && \
-#              curl -s localhost:8001/status | jq -r '.database.reachable==true or error("Kong failed to start")' && \
-#              echo Postgres and Kong ready && \
-              exit 0
+            nc -z localhost 5432 && exit 0
             echo -n .
             sleep 1
           done
