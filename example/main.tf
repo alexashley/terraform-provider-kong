@@ -57,3 +57,12 @@ resource "kong_plugin_ip_header_restriction" "route-ip-header-restriction" {
   route_id = "${kong_route.mock.id}"
   whitelist = ["181.28.140.88"]
 }
+
+
+// imported resources
+// run ./create-resources-to-import.sh to create them
+//resource "kong_service" "service-to-import" {
+//  name = "service-to-import"
+//  url = "http://mockbin.org/request"
+//}
+
