@@ -108,5 +108,5 @@ func resourceKongPluginIpHeaderRestrictionUpdate(data *schema.ResourceData, meta
 func resourceKongPluginIpHeaderRestrictionDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	return kongClient.DeleteRoute(data.Id())
+	return kongClient.DeletePlugin(data.Id())
 }
