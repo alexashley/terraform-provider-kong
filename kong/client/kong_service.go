@@ -15,6 +15,10 @@ func (kongClient *KongClient) CreateService(serviceToCreate KongService) (*KongS
 	return &newService, nil
 }
 
+func (kongClient *KongClient) UpdateService(serviceToUpdate KongService) error {
+	return kongClient.put(servicePath(serviceToUpdate.Id), serviceToUpdate)
+}
+
 func (kongClient *KongClient) DeleteService(serviceId string) error {
 	return kongClient.delete(servicePath(serviceId))
 }

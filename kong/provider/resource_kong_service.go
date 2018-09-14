@@ -58,14 +58,7 @@ func resourceKongService() *schema.Resource {
 func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	kongService := client.KongService{
-		Name:           data.Get("name").(string),
-		Url:            data.Get("url").(string),
-		ConnectTimeout: data.Get("connect_timeout").(int),
-		Retries:        data.Get("retries").(int),
-		ReadTimeout:    data.Get("read_timeout").(int),
-		WriteTimeout:   data.Get("write_timeout").(int),
-	}
+	kongService := mapToApiClient(data)
 
 	service, err := kongClient.CreateService(kongService)
 
@@ -106,11 +99,32 @@ func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceKongServiceUpdate(data *schema.ResourceData, meta interface{}) error {
-	return nil
+	kongClient := meta.(*client.KongClient)
+
+	serviceToUpdate := mapToApiClient(data)
+	err := kongClient.UpdateService(serviceToUpdate)
+
+	if err != nil {
+		return err
+	}
+
+	return resourceKongServiceRead(data, meta)
 }
 
 func resourceKongServiceDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeleteService(data.Id())
+}
+
+func mapToApiClient(data *schema.ResourceData) client.KongService {
+	return client.KongService{
+		Id:             data.Id(),
+		Name:           data.Get("name").(string),
+		Url:            data.Get("url").(string),
+		ConnectTimeout: data.Get("connect_timeout").(int),
+		Retries:        data.Get("retries").(int),
+		ReadTimeout:    data.Get("read_timeout").(int),
+		WriteTimeout:   data.Get("write_timeout").(int),
+	}
 }

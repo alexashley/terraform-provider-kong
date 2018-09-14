@@ -36,6 +36,10 @@ func (kongClient *KongClient) post(path string, payload interface{}, responseRes
 	return kongClient.request("POST", path, payload, responseResource)
 }
 
+func (kongClient *KongClient) put(path string, payload interface{}) error {
+	return kongClient.request("PUT", path, payload, nil)
+}
+
 func (kongClient *KongClient) get(path string, responseResource interface{}) error {
 	return kongClient.request("GET", path, nil, responseResource)
 }
