@@ -4,7 +4,19 @@ jobs:
     docker:
     - image: circleci/golang:1.11
     - image: postgres:9.5
+      environment:
+        - POSTGRES_USER=kong
+        - POSTGRES_DB=kong
     - image: alexashley/tf-provider-custom-kong:0.0.1
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_DATABASE=kong
+      - KONG_PG_PASSWORD=kongdb
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stdout
+      - KONG_ADMIN_ERROR_LOG=/dev/stdout
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
     - checkout
