@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -31,50 +32,38 @@ func NewKongClient(config KongConfig) (*KongClient, error) {
 	return &KongClient{Config: config, client: httpClient}, nil
 }
 
-func (kongClient *KongClient) postJson(path string, payload interface{}, responseResource interface{}) error {
-	endpoint := kongClient.Config.AdminApiUrl + path
-
-	serializedPayload, err := json.Marshal(payload)
-
-	if err != nil {
-		return err
-	}
-
-	request, err := http.NewRequest("POST", endpoint, bytes.NewReader(serializedPayload))
-
-	if err != nil {
-		return err
-	}
-
-	kongClient.addDefaultHeaders(request)
-	request.Header.Set("Content-Type", "application/json")
-
-	response, err := kongClient.client.Do(request)
-
-	if err != nil {
-		return err
-	}
-
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, responseResource)
+func (kongClient *KongClient) post(path string, payload interface{}, responseResource interface{}) error {
+	return kongClient.request("POST", path, payload, responseResource)
 }
 
 func (kongClient *KongClient) get(path string, responseResource interface{}) error {
+	return kongClient.request("GET", path, nil, responseResource)
+}
+
+func (kongClient *KongClient) delete(path string) error {
+	return kongClient.request("DELETE", path, nil, nil)
+}
+
+func (kongClient *KongClient) request(method string, path string, payload interface{}, responseResource interface{}) error {
 	endpoint := kongClient.Config.AdminApiUrl + path
-	request, err := http.NewRequest("GET", endpoint, nil)
+
+	serializedPayload, err := serialize(method, payload)
+
+	if err != nil {
+		return err
+	}
+
+	request, err := http.NewRequest(method, endpoint, serializedPayload)
 
 	if err != nil {
 		return err
 	}
 
 	kongClient.addDefaultHeaders(request)
+
+	if methodShouldHavePayload(method) {
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	response, err := kongClient.client.Do(request)
 
@@ -90,25 +79,35 @@ func (kongClient *KongClient) get(path string, responseResource interface{}) err
 		return err
 	}
 
-	return json.Unmarshal(body, responseResource)
-}
+	if response.StatusCode >= 400 {
+		errorMessage := string(body[:])
 
-func (kongClient *KongClient) delete(path string) error {
-	endpoint := kongClient.Config.AdminApiUrl + path
-
-	request, err := http.NewRequest("DELETE", endpoint, nil)
-
-	if err != nil {
-		return err
+		return &KongHttpError{StatusCode: response.StatusCode, Message: errorMessage}
 	}
 
-	_, err = kongClient.client.Do(request)
-
-	if err != nil {
-		return err
+	if responseResource != nil {
+		return json.Unmarshal(body, responseResource)
 	}
 
 	return nil
+}
+
+func serialize(method string, payload interface{}) (io.Reader, error) {
+	if methodShouldHavePayload(method) && payload != nil {
+		serializedPayload, err := json.Marshal(payload)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return bytes.NewReader(serializedPayload), nil
+	}
+
+	return nil, nil
+}
+
+func methodShouldHavePayload(method string) bool {
+	return method == "PUT" || method == "POST"
 }
 
 func (kongClient *KongClient) addDefaultHeaders(request *http.Request) {

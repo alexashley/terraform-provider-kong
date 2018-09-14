@@ -5,7 +5,7 @@ const pluginPath = "/plugins"
 func (kongClient *KongClient) CreatePlugin(pluginToCreate KongPlugin) (*KongPlugin, error) {
 	var newPlugin KongPlugin
 
-	err := kongClient.postJson(pluginPath, pluginToCreate, &newPlugin)
+	err := kongClient.post(pluginPath, pluginToCreate, &newPlugin)
 
 	if err != nil {
 		return nil, err

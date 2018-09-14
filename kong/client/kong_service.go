@@ -6,7 +6,7 @@ const servicesPath = "/services"
 
 func (kongClient *KongClient) CreateService(serviceToCreate KongService) (*KongService, error) {
 	var newService KongService
-	err := kongClient.postJson(servicesPath, serviceToCreate, &newService)
+	err := kongClient.post(servicesPath, serviceToCreate, &newService)
 
 	if err != nil {
 		return nil, err

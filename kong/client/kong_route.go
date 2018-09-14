@@ -4,7 +4,7 @@ const routePath = "/routes"
 
 func (kongClient *KongClient) CreateRoute(routeToCreate KongRoute) (*KongRoute, error) {
 	var newRoute KongRoute
-	err := kongClient.postJson(routePath, routeToCreate, &newRoute)
+	err := kongClient.post(routePath, routeToCreate, &newRoute)
 
 	if err != nil {
 		return nil, err
