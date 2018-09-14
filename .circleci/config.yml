@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/golang:1.9
+    - image: circleci/golang:1.11
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
@@ -13,15 +13,5 @@ jobs:
         command: |
           set -x
           docker-compose up -d
-    - run:
-        name: Wait for Postgres to initialize
-        command: |
-          for i in `seq 1 10`;
-          do
-            nc -z localhost 5432 && exit 0
-            echo -n .
-            sleep 1
-          done
-          echo Failed waiting for Postgres/Kong && exit 1
     - run: make build
     - run: make testacc
