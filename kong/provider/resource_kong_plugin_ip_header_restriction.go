@@ -75,7 +75,7 @@ func resourceKongPluginIpHeaderRestrictionCreate(data *schema.ResourceData, meta
 
 	data.SetId(plugin.Id)
 
-	return resourceKongRouteRead(data, meta)
+	return resourceKongPluginIpHeaderRestrictionRead(data, meta)
 }
 
 func resourceKongPluginIpHeaderRestrictionRead(data *schema.ResourceData, meta interface{}) error {

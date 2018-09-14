@@ -65,7 +65,7 @@ func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error
 
 	data.SetId(plugin.Id)
 
-	return resourceKongRouteRead(data, meta)
+	return resourceKongPluginRead(data, meta)
 }
 
 func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
