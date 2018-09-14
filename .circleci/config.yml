@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
     - image: circleci/golang:1.11
+      environment:
+        GO111MODULE=on
     - image: postgres:9.5
       environment:
       - POSTGRES_USER=kong
@@ -22,11 +24,11 @@ jobs:
     steps:
     - checkout
     - run:
-        name: Start Postgres and Kong
+        name: Wait for Kong to initialize
         command: |
           set -x
           sleep 20
-          curl localhost:8001
+          curl localhost:8001/status
     - run:
         name: Build and run acceptance tests
         command: |
