@@ -14,4 +14,4 @@ jobs:
           set -x
           docker-compose up -d
     - run: make build
-    - run: make testacc
+    - run: unset GOPATH && make testacc
