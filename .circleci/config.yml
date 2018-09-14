@@ -3,19 +3,17 @@ jobs:
   build:
     docker:
     - image: circleci/golang:1.11
-
+    - image: postgres:9.5
+    - image: alexashley/tf-provider-custom-kong:0.0.1
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
     - checkout
-    - setup_remote_docker
     - run:
         name: Start Postgres and Kong
         command: |
           set -x
-          docker-compose up -d
           sleep 10
-          docker run --network container:kong \
-            appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:8001/status
+          curl localhost:8001
     - run:
         name: Build and run acceptance tests
         command: |
