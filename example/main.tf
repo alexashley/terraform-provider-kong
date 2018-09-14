@@ -13,14 +13,13 @@ resource "kong_route" "mock" {
     "/mock"]
 }
 
-resource "kong_plugin" "response-transformer-plugin-route" {
-  route_id = "${kong_route.mock.id}"
-  name = "response-transformer"
-  config = {
-    add.json = "added-by-terraform:true",
-    add.headers = "x-parent-resource:route"
-  }
-}
+//resource "kong_plugin" "response-transformer-plugin-route" {
+//  route_id = "${kong_route.mock.id}"
+//  name = "response-transformer"
+//  config_json =<<EOF
+//"add": {"json": "added-by-terraform:true", "headers": "x-parent-resource:route"}}
+//EOF
+//}
 
 variable "test-count-enabled" {
   default = "no"
@@ -58,11 +57,33 @@ resource "kong_plugin_ip_header_restriction" "route-ip-header-restriction" {
   whitelist = ["181.28.140.88"]
 }
 
+variable basic-auth-foo-config {
+  type = "string"
+  default =<<EOF
+{"anonymous":"","hide_credentials":true}
+EOF
+}
 
+resource "kong_plugin" "basic-auth-foo" {
+  route_id = "${kong_route.mock.id}"
+  name = "basic-auth"
+  config_json = "${chomp(var.basic-auth-foo-config)}"
+}
 // imported resources
-// run ./create-resources-to-import.sh to create them
-//resource "kong_service" "service-to-import" {
+// run ./create-resources-to-import.sh to create them and then uncomment the block below
+//resource "kong_service" "imported-service" {
 //  name = "service-to-import"
 //  url = "http://mockbin.org/request"
 //}
-
+//resource "kong_route" "imported-route" {
+//  service_id = "${kong_service.imported-service.id}"
+//  paths = ["/route-to-import"]
+//}
+//resource "kong_plugin" "imported-basic-auth-plugin" {
+//  route_id = "${kong_route.imported-route.id}"
+//  name = "basic-auth"
+//}
+//resource "kong_plugin_ip_header_restriction" "imported-ip-header-restriction-plugin" {
+//  route_id = "${kong_route.imported-route.id}"
+//  whitelist = ["244.213.135.114"]
+//}

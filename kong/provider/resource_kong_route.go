@@ -11,6 +11,9 @@ func resourceKongRoute() *schema.Resource {
 		Read:   resourceKongRouteRead,
 		Update: resourceKongRouteUpdate,
 		Delete: resourceKongRouteDelete,
+		Importer: &schema.ResourceImporter{
+			State: importResourceIfUuidIsValid,
+		},
 		Schema: map[string]*schema.Schema{
 			"protocols": &schema.Schema{
 				Type: schema.TypeList,
@@ -105,8 +108,13 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 	route, err := kongClient.GetRoute(data.Id())
 
 	if err != nil {
-		data.SetId("")
-		return nil
+		if resourceDoesNotExistError(err) {
+			data.SetId("")
+
+			return nil
+		}
+
+		return err
 	}
 
 	data.Set("hosts", route.Hosts)
@@ -114,7 +122,7 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 	data.Set("methods", route.Methods)
 	data.Set("paths", route.Paths)
 	data.Set("strip_path", route.StripPath)
-	data.Set("preserve_hosts", route.PreserveHost)
+	data.Set("preserve_host", route.PreserveHost)
 	data.Set("service_id", route.Service.Id)
 	data.Set("created_at", route.CreatedAt)
 	data.Set("updated_at", route.UpdatedAt)

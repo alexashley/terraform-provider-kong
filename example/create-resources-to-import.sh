@@ -31,7 +31,7 @@ echo "Made basic-auth plugin with id ${basic_auth_plugin_id}"
 
 ip_header_restriction_plugin_id=$(curl -s -X POST ${KONG_API}/plugins \
   -d 'name=ip-header-restriction' \
-  -d "route_id=$(jq -n ${route} | jq -r '.id')" \
-  -d 'config.whitelist=["244.213.135.114"]' | jq -r '.id')
+  -d "route_id=${route_id}" \
+  -d 'config.whitelist=244.213.135.114' | jq -r '.id')
 
 echo "Made ip-header-restriction plugin with id ${ip_header_restriction_plugin_id}"

@@ -11,6 +11,9 @@ func resourceKongPluginIpHeaderRestriction() *schema.Resource {
 		Read:   resourceKongPluginIpHeaderRestrictionRead,
 		Update: resourceKongPluginIpHeaderRestrictionUpdate,
 		Delete: resourceKongPluginIpHeaderRestrictionDelete,
+		Importer: &schema.ResourceImporter{
+			State: importResourceIfUuidIsValid,
+		},
 		Schema: map[string]*schema.Schema{
 			"service_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -84,8 +87,13 @@ func resourceKongPluginIpHeaderRestrictionRead(data *schema.ResourceData, meta i
 	plugin, err := kongClient.GetPlugin(data.Id())
 
 	if err != nil {
-		data.SetId("")
-		return nil
+		if resourceDoesNotExistError(err) {
+			data.SetId("")
+
+			return nil
+		}
+
+		return err
 	}
 
 	data.Set("service_id", plugin.ServiceId)

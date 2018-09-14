@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/client"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -13,7 +12,7 @@ func resourceKongService() *schema.Resource {
 		Update: resourceKongServiceUpdate,
 		Delete: resourceKongServiceDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceKongServiceImport,
+			State: importResourceIfUuidIsValid,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -85,9 +84,7 @@ func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error 
 	service, err := kongClient.GetService(data.Id())
 
 	if err != nil {
-		httpError, ok := err.(*client.KongHttpError)
-
-		if ok && httpError.StatusCode == 404 {
+		if resourceDoesNotExistError(err) {
 			data.SetId("")
 
 			return nil
@@ -116,14 +113,4 @@ func resourceKongServiceDelete(data *schema.ResourceData, meta interface{}) erro
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeleteService(data.Id())
-}
-
-func resourceKongServiceImport(data *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	id := data.Id()
-
-	if !isValidUuid(id) {
-		return nil, fmt.Errorf("%s is not a valid UUID", id)
-	}
-
-	return []*schema.ResourceData{data}, nil
 }

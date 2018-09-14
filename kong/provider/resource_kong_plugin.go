@@ -1,7 +1,10 @@
 package provider
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/util"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -11,6 +14,9 @@ func resourceKongPlugin() *schema.Resource {
 		Read:   resourceKongPluginRead,
 		Update: resourceKongPluginUpdate,
 		Delete: resourceKongPluginDelete,
+		Importer: &schema.ResourceImporter{
+			State: importResourceIfUuidIsValid, // TODO: change import to always import config_json over config
+		},
 		Schema: map[string]*schema.Schema{
 			"service_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -29,11 +35,15 @@ func resourceKongPlugin() *schema.Resource {
 				Required: true,
 			},
 			"config": &schema.Schema{
-				Type: schema.TypeMap,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional: true,
+				Type:          schema.TypeMap,
+				Elem:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"config_json"},
+			},
+			"config_json": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"config"},
 			},
 			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -50,12 +60,19 @@ func resourceKongPlugin() *schema.Resource {
 
 func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
+
+	config, err := getPluginConfig(data)
+
+	if err != nil {
+		return err
+	}
+
 	plugin, err := kongClient.CreatePlugin(client.KongPlugin{
 		ServiceId:  data.Get("service_id").(string),
 		RouteId:    data.Get("route_id").(string),
 		ConsumerId: data.Get("consumer_id").(string),
 		Name:       data.Get("name").(string),
-		Config:     data.Get("config").(map[string]interface{}),
+		Config:     config,
 		Enabled:    data.Get("enabled").(bool),
 	})
 
@@ -74,8 +91,13 @@ func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
 	plugin, err := kongClient.GetPlugin(data.Id())
 
 	if err != nil {
-		data.SetId("")
-		return nil
+		if resourceDoesNotExistError(err) {
+			data.SetId("")
+
+			return nil
+		}
+
+		return err
 	}
 
 	data.Set("service_id", plugin.ServiceId)
@@ -84,7 +106,24 @@ func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
 	data.Set("name", plugin.Name)
 	data.Set("enabled", plugin.Enabled)
 	data.Set("created_at", plugin.CreatedAt)
-	data.Set("config", plugin.Config)
+
+	if data.Get("config_json").(string) != "" {
+		configJson, _ := json.Marshal(plugin.Config)
+		util.Log("setting config_json for " + plugin.Name + " to value: " + string(configJson[:]))
+		data.Set("config_json", string(configJson[:]))
+	} else {
+		util.Log("setting config for " + plugin.Name)
+		configErr := data.Set("config", plugin.Config)
+
+		if configErr != nil {
+			// TF can only handle simple maps, so destroy any plugins where the config cannot be persisted.
+			// This is mainly for plugins where the **default** config cannot be created as map[string]string
+			// For example, basic-auth has a `hide_credentials` flag, which cannot be converted to a string
+			data.SetId("")
+
+			return fmt.Errorf("%s; you must delete the resource by-hand and use the config_json field for more complex configurations", configErr)
+		}
+	}
 
 	return nil
 }
@@ -97,4 +136,24 @@ func resourceKongPluginDelete(data *schema.ResourceData, meta interface{}) error
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeletePlugin(data.Id())
+}
+
+func getPluginConfig(data *schema.ResourceData) (map[string]interface{}, error) {
+	var config map[string]interface{}
+
+	config = data.Get("config").(map[string]interface{})
+
+	if len(config) != 0 {
+		return config, nil
+	}
+
+	configJson := data.Get("config_json").(string)
+
+	err := json.Unmarshal([]byte(configJson), &config)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }
