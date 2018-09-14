@@ -12,7 +12,7 @@ jobs:
         name: Start Postgres and Kong
         command: |
           set -x
-          docker-compose up
+          docker-compose up -d
     - run:
         name: Wait for Postgres to initialize
         command: |
