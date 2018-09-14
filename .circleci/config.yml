@@ -23,6 +23,9 @@ jobs:
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
     - checkout
+    - restore_cache:
+        keys:
+        - v1-pkg-cache
     - run:
         name: Wait for Kong to initialize
         command: |
@@ -30,8 +33,12 @@ jobs:
           sleep 20
           curl localhost:8001/status
     - run:
-        name: Build and run acceptance tests
-        command: |
-          curl localhost:8001/status
-          make build
-          make testacc
+        name: Build
+        command: make build
+    - save_cache:
+        key: v1-pkg-cache
+        paths:
+        - "/go/pkg"
+    - run:
+        name: Acceptance tests
+        command: make testacc
