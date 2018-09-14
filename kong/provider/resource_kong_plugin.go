@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/client"
-	"github.com/alexashley/terraform-provider-kong/kong/util"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/structure"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceKongPlugin() *schema.Resource {
@@ -44,6 +45,8 @@ func resourceKongPlugin() *schema.Resource {
 				Type:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"config"},
+				ValidateFunc: validation.ValidateJsonString,
+				DiffSuppressFunc: structure.SuppressJsonDiff,
 			},
 			"enabled": &schema.Schema{
 				Type:     schema.TypeBool,
@@ -109,19 +112,17 @@ func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
 
 	if data.Get("config_json").(string) != "" {
 		configJson, _ := json.Marshal(plugin.Config)
-		util.Log("setting config_json for " + plugin.Name + " to value: " + string(configJson[:]))
 		data.Set("config_json", string(configJson[:]))
 	} else {
-		util.Log("setting config for " + plugin.Name)
 		configErr := data.Set("config", plugin.Config)
 
 		if configErr != nil {
-			// TF can only handle simple maps, so destroy any plugins where the config cannot be persisted.
+			// TF schema can only handle simple maps.
 			// This is mainly for plugins where the **default** config cannot be created as map[string]string
 			// For example, basic-auth has a `hide_credentials` flag, which cannot be converted to a string
 			data.SetId("")
 
-			return fmt.Errorf("%s; you must delete the resource by-hand and use the config_json field for more complex configurations", configErr)
+			return fmt.Errorf("%s; use the config_json field for more complex configurations; you may have to import the resource by-hand or delete and re-create using the config_json field", configErr)
 		}
 	}
 
@@ -142,12 +143,11 @@ func getPluginConfig(data *schema.ResourceData) (map[string]interface{}, error) 
 	var config map[string]interface{}
 
 	config = data.Get("config").(map[string]interface{})
+	configJson := data.Get("config_json").(string)
 
 	if len(config) != 0 {
 		return config, nil
 	}
-
-	configJson := data.Get("config_json").(string)
 
 	err := json.Unmarshal([]byte(configJson), &config)
 

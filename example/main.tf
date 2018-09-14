@@ -60,14 +60,17 @@ resource "kong_plugin_ip_header_restriction" "route-ip-header-restriction" {
 variable basic-auth-foo-config {
   type = "string"
   default =<<EOF
-{"anonymous":"","hide_credentials":true}
+{
+  "anonymous": "",
+  "hide_credentials": true
+}
 EOF
 }
 
 resource "kong_plugin" "basic-auth-foo" {
   route_id = "${kong_route.mock.id}"
   name = "basic-auth"
-  config_json = "${chomp(var.basic-auth-foo-config)}"
+  config_json = "${var.basic-auth-foo-config}"
 }
 // imported resources
 // run ./create-resources-to-import.sh to create them and then uncomment the block below
