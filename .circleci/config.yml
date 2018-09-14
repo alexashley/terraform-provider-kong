@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/golang:1.9
+
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    steps:
+    - checkout
+    - run:
+        name: Start Postgres and Kong
+        command: |
+          set -x
+          docker-compose up
+    - run:
+        name: Wait for Postgres to initialize
+        command: |
+          for i in `seq 1 10`;
+          do
+            nc -z localhost 5432 && \
+              curl -s localhost:8001/status | jq -r '.database.reachable==true or error("Kong failed to start")' && \
+              echo Postgres and Kong ready &&  \
+              exit 0
+            echo -n .
+            sleep 1
+          done
+          echo Failed waiting for Postgres/Kong && exit 1
+    - run: make build
+    - run: make testacc
