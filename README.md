@@ -18,13 +18,60 @@ I also don't intend to add support for the following resources, since I don't cu
 
 That said, PRs are welcome and may I try to implement them once the other resources are mature.
 
-### Services
+### Provider
+```hcl
+provider "kong" {
+  admin_api_url = "http://localhost:8001"
+  rbac_token = "foobar" // Only available with the enterprise edition
+}
+```
 
+### Services (`kong_service`)
+A representation of Kong's [service object](https://docs.konghq.com/0.14.x/admin-api/#service-object).
 
-### Routes
+#### Schema
+| field             | explanation                                                                          | type   | default |
+|-------------------|--------------------------------------------------------------------------------------|--------|---------|
+| `name`            | The service name.                                                                    | `string` | N/A     |
+| `url`             | The url for the service. It encapsulates protocol, host, port and path.              | `string` | N/A     |
+| `connect_timeout` | Time in milliseconds to connect to the upstream server.                              | `int`    | 60000   |
+| `read_timeout`    | Time in milliseconds between two  read operations to the upstream server.            | `int`    | 60000   |
+| `write_timeout`   | Time in milliseconds between two successive write operations to the upstream server. | `int`    | 60000   |
+| `retries`         | Number of times Kong will try to proxy if there's an error.                        | `int`    | 5       |
 
+#### Example
+```hcl
+resource "kong_service" "mockbin" {
+  name = "mockbin"
+  url = "https://mockbin.org/request"
+}
+```
 
-### Plugins
+### Routes (`kong_route`)
+A representation of Kong's [route object](https://docs.konghq.com/0.14.x/admin-api/#route-object).
+Services can have many routes, but a route corresponds to just one service.
+
+For more information on `regex_priority`, see the [Kong docs](https://docs.konghq.com/0.14.x/proxy/#evaluation-order).
+
+#### Schema
+| field            | explanation                                                                                                                                    | type     | default             |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------------------|
+| `protocols`      | Protocols that Kong will proxy to this route                                                                                                   | `[]string` | `["http", "https"]` |
+| `methods`        | HTTP methods that Kong will proxy to this route                                                                                                | `[]string` | `[]`                |
+| `paths`          | List of path prefixes that will match this route                                                                                               | `[]string` | `[]`                |
+| `strip_path`     | If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request.                     | `bool`     | true                |
+| `preserve_host`  | If the route is matched by the `Host` header, this flag indicates if the `Host` header should be set to the matched value.                     | `bool`     | false               |
+| `regex_priority` | Determines the order that paths defined by regexs are evaluated. Larger numbers are evaluated first, but simple path prefixes take precedence. | `int`      | 0                   |
+| `service_id`     | The associated service.                                                                                                                        | `string`   | N/A                 |
+#### Example
+```hcl
+resource "kong_route" "mock" {
+  service_id = "${kong_service.mockbin.id}"
+  paths = ["/mock"]
+}
+```
+
+### Plugins (`kong_plugin`)
 
 
 #### Custom Plugins/Specialized Plugin Resources
@@ -34,6 +81,7 @@ That said, PRs are welcome and may I try to implement them once the other resour
 
 
 ### Admins/RBAC
+
 
 ## Development
 
