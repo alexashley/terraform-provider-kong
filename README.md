@@ -5,19 +5,6 @@ A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
 ## Resources
 
-### Unsupported Resources
-
-No plans to support the legacy [API resource](https://docs.konghq.com/0.12.x/admin-api/#api-object).
-
-I also don't intend to add support for the following resources, since I don't currently use them:
-
-- [Certificate](https://docs.konghq.com/0.14.x/admin-api/#certificate-object)
-- [SNI](https://docs.konghq.com/0.14.x/admin-api/#sni-objects)
-- [Upstream](https://docs.konghq.com/0.14.x/admin-api/#upstream-objects)
-- [Target](https://docs.konghq.com/0.14.x/admin-api/#target-object)
-
-That said, PRs are welcome and may I try to implement them once the other resources are mature.
-
 ### Provider
 ```hcl
 provider "kong" {
@@ -47,6 +34,11 @@ resource "kong_service" "mockbin" {
 }
 ```
 
+#### Import
+Existing Kong services can be imported:
+
+`terraform import kong_service.name-of-service-to-import <service UUID>`
+
 ### Routes (`kong_route`)
 A representation of Kong's [route object](https://docs.konghq.com/0.14.x/admin-api/#route-object).
 Services can have many routes, but a route corresponds to just one service.
@@ -70,18 +62,30 @@ resource "kong_route" "mock" {
   paths = ["/mock"]
 }
 ```
+#### Import
+Existing Kong routes can be imported into Terraform:
+
+`terraform import kong_route.name-of-route-to-import <route UUID>`
 
 ### Plugins (`kong_plugin`)
-
-
-#### Custom Plugins/Specialized Plugin Resources
-
 
 ### Consumers
 
 
 ### Admins/RBAC
 
+### Unsupported Resources
+
+No plans to support the legacy [API resource](https://docs.konghq.com/0.12.x/admin-api/#api-object).
+
+I also don't intend to add support for the following resources, since I don't currently use them:
+
+- [Certificate](https://docs.konghq.com/0.14.x/admin-api/#certificate-object)
+- [SNI](https://docs.konghq.com/0.14.x/admin-api/#sni-objects)
+- [Upstream](https://docs.konghq.com/0.14.x/admin-api/#upstream-objects)
+- [Target](https://docs.konghq.com/0.14.x/admin-api/#target-object)
+
+That said, PRs are welcome and may I try to implement them once the other resources are mature.
 
 ## Development
 
