@@ -81,17 +81,7 @@ func resourceKongRoute() *schema.Resource {
 func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
-	route, err := kongClient.CreateRoute(client.KongRoute{
-		Methods:      toStringArray(data.Get("methods").([]interface{})),
-		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
-		Hosts:        toStringArray(data.Get("hosts").([]interface{})),
-		Paths:        toStringArray(data.Get("paths").([]interface{})),
-		StripPath:    data.Get("strip_path").(bool),
-		PreserveHost: data.Get("preserve_host").(bool),
-		Service: client.KongServiceReference{
-			Id: data.Get("service_id").(string),
-		},
-	})
+	route, err := kongClient.CreateRoute(mapToApi(data))
 
 	if err != nil {
 		return err
@@ -132,11 +122,34 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKongRouteUpdate(data *schema.ResourceData, meta interface{}) error {
-	return nil
+	kongClient := meta.(*client.KongClient)
+
+	err := kongClient.UpdateRoute(mapToApi(data))
+
+	if err != nil {
+		return err
+	}
+
+	return resourceKongRouteRead(data, meta)
 }
 
 func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*client.KongClient)
 
 	return kongClient.DeleteRoute(data.Id())
+}
+
+func mapToApi(data *schema.ResourceData) client.KongRoute {
+	return client.KongRoute{
+		Id:           data.Id(),
+		Methods:      toStringArray(data.Get("methods").([]interface{})),
+		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
+		Hosts:        toStringArray(data.Get("hosts").([]interface{})),
+		Paths:        toStringArray(data.Get("paths").([]interface{})),
+		StripPath:    data.Get("strip_path").(bool),
+		PreserveHost: data.Get("preserve_host").(bool),
+		Service: client.KongServiceReference{
+			Id: data.Get("service_id").(string),
+		},
+	}
 }

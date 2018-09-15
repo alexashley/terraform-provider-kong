@@ -27,3 +27,7 @@ func (kongClient *KongClient) GetRoute(routeId string) (*KongRoute, error) {
 func (kongClient *KongClient) DeleteRoute(routeId string) error {
 	return kongClient.delete(routePath + "/" + routeId)
 }
+
+func (kongClient *KongClient) UpdateRoute(routeToUpdate KongRoute) error {
+	return kongClient.put(routePath+"/"+routeToUpdate.Id, routeToUpdate)
+}
