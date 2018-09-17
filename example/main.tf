@@ -13,13 +13,12 @@ resource "kong_route" "mock" {
     "/mock"]
 }
 
-//resource "kong_plugin" "response-transformer-plugin-route" {
-//  route_id = "${kong_route.mock.id}"
-//  name = "response-transformer"
-//  config_json =<<EOF
-//"add": {"json": "added-by-terraform:true", "headers": "x-parent-resource:route"}}
-//EOF
-//}
+resource "kong_plugin_request_transformer_advanced" "request-transformer-plugin-service" {
+  service_id = "${kong_service.mockbin.id}"
+  add_headers = ["x-parent-resource:service"]
+  http_method = "GET",
+  replace_uri = "/foobar"
+}
 
 variable "test-count-enabled" {
   default = "no"
@@ -56,6 +55,12 @@ resource "kong_plugin_ip_header_restriction" "route-ip-header-restriction" {
   route_id = "${kong_route.mock.id}"
   whitelist = ["181.28.140.88"]
 }
+
+resource "kong_plugin_ip_header_restriction" "service-ip-header-restriction" {
+  service_id = "${kong_service.mockbin.id}"
+  whitelist = ["181.28.123.45"]
+}
+
 
 variable basic-auth-foo-config {
   type = "string"

@@ -5,6 +5,6 @@ WORKDIR /usr/local/kong
 RUN apk update && apk add postgresql-client
 
 COPY entrypoint.sh .
-COPY custom-plugins/ip-header-restriction/kong/plugins /usr/local/share/lua/5.1/kong/plugins/
+COPY plugins/ /usr/local/share/lua/5.1/kong/plugins/
 
 CMD ["/usr/local/kong/entrypoint.sh"]

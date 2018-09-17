@@ -12,8 +12,7 @@ type KongService struct {
 
 	// Kong's api treats `url` as a write-only property.
 	// This is useful for creating or updating a service (simply supply the url instead of four other fields),
-	// However, in the interest of a consistent model, this package only exposes a url field, for both reading and writing.
-	// The other fields (protocol, host, port, path) are in the struct only so that the url field can be populated.
+	// However, in the interest of a consistent model, this package exposes a url field for both reading and writing.
 	Url      string `json:"url,omitempty"`
 	Protocol string `json:"protocol,omitempty"`
 	Host     string `json:"host,omitempty"`
@@ -40,12 +39,17 @@ type KongRoute struct {
 }
 
 type KongPlugin struct {
-	Id         string                 `json:"id,omitempty"`
-	ServiceId  string                 `json:"service_id,omitempty"`
-	RouteId    string                 `json:"route_id,omitempty"`
-	ConsumerId string                 `json:"consumer_id,omitempty"`
-	Name       string                 `json:"name,omitempty"`
-	Config     map[string]interface{} `json:"config,omitempty"`
-	Enabled    bool                   `json:"enabled,omitempty"`
-	CreatedAt  int64                  `json:"created_at,omitempty"`
+	Id         string      `json:"id,omitempty"`
+	ServiceId  string      `json:"service_id,omitempty"`
+	RouteId    string      `json:"route_id,omitempty"`
+	ConsumerId string      `json:"consumer_id,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	Config     interface{} `json:"config,omitempty"`
+	Enabled    bool        `json:"enabled,omitempty"`
+	CreatedAt  int64       `json:"created_at,omitempty"`
+}
+
+type KongServicesPage struct {
+	Next string        `json:"next,omitempty"`
+	Data []KongService `json:"data"`
 }

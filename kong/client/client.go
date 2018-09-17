@@ -24,12 +24,12 @@ type KongClient struct {
 	client *http.Client
 }
 
-func NewKongClient(config KongConfig) (*KongClient, error) {
+func NewKongClient(config KongConfig) *KongClient {
 	httpClient := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
-	return &KongClient{Config: config, client: httpClient}, nil
+	return &KongClient{Config: config, client: httpClient}
 }
 
 func (kongClient *KongClient) post(path string, payload interface{}, responseResource interface{}) error {
@@ -46,6 +46,10 @@ func (kongClient *KongClient) get(path string, responseResource interface{}) err
 
 func (kongClient *KongClient) delete(path string) error {
 	return kongClient.request("DELETE", path, nil, nil)
+}
+
+func (kongClient *KongClient) patch(path string, payload interface{}) error {
+	return kongClient.request("PATCH", path, payload, nil)
 }
 
 func (kongClient *KongClient) request(method string, path string, payload interface{}, responseResource interface{}) error {
@@ -111,7 +115,7 @@ func serialize(method string, payload interface{}) (io.Reader, error) {
 }
 
 func methodShouldHavePayload(method string) bool {
-	return method == "PUT" || method == "POST"
+	return method == "PUT" || method == "POST" || method == "PATCH"
 }
 
 func (kongClient *KongClient) addDefaultHeaders(request *http.Request) {

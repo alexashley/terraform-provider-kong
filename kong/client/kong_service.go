@@ -1,6 +1,9 @@
 package client
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 const servicesPath = "/services"
 
@@ -34,6 +37,31 @@ func (kongClient *KongClient) GetService(serviceId string) (*KongService, error)
 	service.Url = service.getUrlFromParts()
 
 	return &service, nil
+}
+
+func (kongClient *KongClient) GetServices() ([]KongService, error) {
+	var servicesResult KongServicesPage
+	var allServices = make([]KongService, 0)
+
+	for {
+		url := servicesPath
+
+		if servicesResult.Next != "" {
+			url = strings.Replace(servicesResult.Next, kongClient.Config.AdminApiUrl, "", 1)
+		}
+
+		if err := kongClient.get(url, &servicesResult); err != nil {
+			return nil, err
+		}
+
+		allServices = append(allServices, servicesResult.Data...)
+
+		if servicesResult.Next == "" {
+			break
+		}
+	}
+
+	return allServices, nil
 }
 
 func servicePath(serviceId string) string {

@@ -28,3 +28,7 @@ func (kongClient *KongClient) GetPlugin(pluginId string) (*KongPlugin, error) {
 
 	return &kongPlugin, nil
 }
+
+func (kongClient *KongClient) UpdatePlugin(pluginToUpdate KongPlugin) error {
+	return kongClient.patch(pluginPath+"/"+pluginToUpdate.Id, pluginToUpdate)
+}

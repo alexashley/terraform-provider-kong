@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -179,19 +180,19 @@ func testAccCheckKongRouteAttributes(actualRoute *client.KongRoute, expectedRout
 	return func(s *terraform.State) error {
 
 		if !slicesAreEqual(actualRoute.Protocols, expectedRoute.Protocols) {
-			return expectedAndActualErrorStringSlice("Protocols don't match", expectedRoute.Protocols, actualRoute.Protocols)
+			return test_util.ExpectedAndActualErrorStringSlice("Protocols don't match", expectedRoute.Protocols, actualRoute.Protocols)
 		}
 
 		if !slicesAreEqual(actualRoute.Methods, expectedRoute.Methods) {
-			return expectedAndActualErrorStringSlice("Methods don't match", expectedRoute.Methods, actualRoute.Methods)
+			return test_util.ExpectedAndActualErrorStringSlice("Methods don't match", expectedRoute.Methods, actualRoute.Methods)
 		}
 
 		if !slicesAreEqual(actualRoute.Hosts, expectedRoute.Hosts) {
-			return expectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Hosts, actualRoute.Hosts)
+			return test_util.ExpectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Hosts, actualRoute.Hosts)
 		}
 
 		if !slicesAreEqual(actualRoute.Paths, expectedRoute.Paths) {
-			return expectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Paths, actualRoute.Paths)
+			return test_util.ExpectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Paths, actualRoute.Paths)
 		}
 
 		return nil
@@ -239,8 +240,4 @@ func slicesAreEqual(a []string, b []string) bool {
 	}
 
 	return true
-}
-
-func expectedAndActualErrorStringSlice(message string, expected, actual []string) error {
-	return fmt.Errorf("%s. Expected: %v, actual: %v", message, expected, actual)
 }

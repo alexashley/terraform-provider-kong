@@ -9,3 +9,7 @@ func toStringArray(data []interface{}) []string {
 
 	return result
 }
+
+func toStringArrayFromInterface(data interface{}) []string {
+	return toStringArray(data.([]interface{}))
+}

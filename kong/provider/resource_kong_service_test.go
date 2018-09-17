@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
@@ -255,24 +256,24 @@ func testAccCheckKongServiceDestroy(name string) resource.TestCheckFunc {
 func testAccCheckKongServiceAttributes(actualService *client.KongService, expectedService *client.KongService) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if actualService.Name != expectedService.Name {
-			return expectedAndActualError("Kong service name is wrong", expectedService.Name, actualService.Name)
+			return test_util.ExpectedAndActualError("Kong service name is wrong", expectedService.Name, actualService.Name)
 		}
 
 		if actualService.Url != expectedService.Url {
-			return expectedAndActualError("Kong service url is wrong", expectedService.Url, actualService.Url)
+			return test_util.ExpectedAndActualError("Kong service url is wrong", expectedService.Url, actualService.Url)
 		}
 
 		// test other fields, ignoring if the value is empty in expectedService
 		if expectedService.WriteTimeout != 0 && actualService.WriteTimeout != expectedService.WriteTimeout {
-			return expectedAndActualErrorInt("Kong service write_timeout is wrong", expectedService.WriteTimeout, actualService.WriteTimeout)
+			return test_util.ExpectedAndActualErrorInt("Kong service write_timeout is wrong", expectedService.WriteTimeout, actualService.WriteTimeout)
 		}
 
 		if expectedService.ConnectTimeout != 0 && actualService.ConnectTimeout != expectedService.ConnectTimeout {
-			return expectedAndActualErrorInt("Kong service connect_timeout is wrong", expectedService.ConnectTimeout, actualService.ConnectTimeout)
+			return test_util.ExpectedAndActualErrorInt("Kong service connect_timeout is wrong", expectedService.ConnectTimeout, actualService.ConnectTimeout)
 		}
 
 		if expectedService.Retries != 0 && actualService.Retries != expectedService.Retries {
-			return expectedAndActualErrorInt("Kong service retries is wrong", expectedService.Retries, actualService.Retries)
+			return test_util.ExpectedAndActualErrorInt("Kong service retries is wrong", expectedService.Retries, actualService.Retries)
 		}
 
 		return nil
@@ -322,12 +323,4 @@ resource "kong_service" "override-defaults-service" {
 	read_timeout = %d
 	write_timeout = %d
 }`, service.Name, service.Url, service.ConnectTimeout, service.Retries, service.ReadTimeout, service.WriteTimeout)
-}
-
-func expectedAndActualError(message, expected, actual string) error {
-	return fmt.Errorf("%s. Expected %s, Actual %s", message, expected, actual)
-}
-
-func expectedAndActualErrorInt(message string, expected int, actual int) error {
-	return fmt.Errorf("%s. Expected %d, Actual %d", message, expected, actual)
 }

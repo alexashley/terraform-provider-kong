@@ -12,6 +12,7 @@ func KongProvider() *schema.Provider {
 			"kong_route":                        resourceKongRoute(),
 			"kong_plugin":                       resourceKongPlugin(),
 			"kong_plugin_ip_header_restriction": resourceKongPluginIpHeaderRestriction(),
+			"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
 		},
 		Schema: map[string]*schema.Schema{
 			"admin_api_url": {
@@ -31,7 +32,7 @@ func KongProvider() *schema.Provider {
 			adminApiUrl := data.Get("admin_api_url").(string)
 			rbacToken := data.Get("rbac_token").(string)
 
-			return client.NewKongClient(client.KongConfig{AdminApiUrl: adminApiUrl, RbacToken: rbacToken})
+			return client.NewKongClient(client.KongConfig{AdminApiUrl: adminApiUrl, RbacToken: rbacToken}), nil
 		},
 	}
 }
