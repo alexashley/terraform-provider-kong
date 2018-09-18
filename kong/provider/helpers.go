@@ -2,12 +2,12 @@ package provider
 
 import (
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
 func resourceDoesNotExistError(err error) bool {
-	httpError, ok := err.(*client.KongHttpError)
+	httpError, ok := err.(*kong.HttpError)
 
 	return ok && httpError.StatusCode == 404
 }

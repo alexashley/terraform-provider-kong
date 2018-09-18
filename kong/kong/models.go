@@ -1,4 +1,4 @@
-package client
+package kong
 
 type KongService struct {
 	Id             string `json:"id,omitempty"`
@@ -52,4 +52,33 @@ type KongPlugin struct {
 type KongServicesPage struct {
 	Next string        `json:"next,omitempty"`
 	Data []KongService `json:"data"`
+}
+
+type KongRoutesPage struct {
+	Next string      `json:"next,omitempty"`
+	Data []KongRoute `json:"data"`
+}
+
+type KongPluginsPage struct {
+	Next string      `json:"next,omitempty"`
+	Data []KongRoute `json:"data"`
+}
+
+type KongDatabaseStatus struct {
+	Reachable bool `json:"reachable"`
+}
+
+type KongServerStatus struct {
+	TotalRequests       int `json:"total_requests"`
+	ConnectionsActive   int `json:"connections_active"`
+	ConnectionsAccepted int `json:"connections_accepted"`
+	ConnectionsHandled  int `json:"connections_handled"`
+	ConnectionsReading  int `json:"connections_reading"`
+	ConnectionsWriting  int `json:"connections_writing"`
+	ConnectionsWaiting  int `json:"connections_waiting"`
+}
+
+type KongStatus struct {
+	Server   KongServerStatus   `json:"server"`
+	Database KongDatabaseStatus `json:"database"`
 }

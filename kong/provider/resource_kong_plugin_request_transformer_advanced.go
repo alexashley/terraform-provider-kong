@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/alexashley/terraform-provider-kong/kong/util"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -183,7 +183,7 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 				},
 			}
 		},
-		MapApiModelToResource: func(plugin *client.KongPlugin, data *schema.ResourceData) {
+		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) {
 			pluginConfig := plugin.Config.(map[string]interface{})
 
 			httpMethod, ok := data.GetOk("http_method")

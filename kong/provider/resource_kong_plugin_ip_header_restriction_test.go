@@ -2,7 +2,7 @@ package provider
 
 import (
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccKongPluginIpHeaderRestriction_basic_global_plugin(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	var expectedIpAddresses = []string{test_util.RandomIp(), test_util.RandomIp()}
 
@@ -32,7 +32,7 @@ func TestAccKongPluginIpHeaderRestriction_basic_global_plugin(t *testing.T) {
 						"kong_plugin_ip_header_restriction.test",
 						&plugin,
 					),
-					test_util.TestAccKongPluginConfigAttributes(&plugin, &client.KongPlugin{
+					test_util.TestAccKongPluginConfigAttributes(&plugin, &kong.KongPlugin{
 						Config: map[string]interface{}{
 							"whitelist":       expectedIpAddresses,
 							"ip_header":       "x-forwarded-for",
@@ -55,7 +55,7 @@ func TestAccKongPluginIpHeaderRestriction_basic_global_plugin(t *testing.T) {
 }
 
 func TestAccKongPluginIpHeaderRestriction_basic_service_plugin(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	var expectedIpAddresses = []string{test_util.RandomIp()}
 	serviceName := "kong-terraform-acc-test-" + acctest.RandString(10)
@@ -89,7 +89,7 @@ func TestAccKongPluginIpHeaderRestriction_basic_service_plugin(t *testing.T) {
 }
 
 func TestAccKongPluginIpHeaderRestriction_basic_route_plugin(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	var expectedIpAddresses = []string{test_util.RandomIp(), test_util.RandomIp(), test_util.RandomIp()}
 	serviceName := "kong-terraform-acc-test-" + acctest.RandString(10)
@@ -126,7 +126,7 @@ func TestAccKongPluginIpHeaderRestriction_basic_route_plugin(t *testing.T) {
 }
 
 func TestAccKongPluginIpHeaderRestriction_update(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	var expectedIpAddresses = []string{test_util.RandomIp(), test_util.RandomIp()}
 	var updatedIpAddresses = []string{test_util.RandomIp()}

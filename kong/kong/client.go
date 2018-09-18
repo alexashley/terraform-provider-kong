@@ -1,8 +1,9 @@
-package client
+package kong
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -24,12 +25,24 @@ type KongClient struct {
 	client *http.Client
 }
 
-func NewKongClient(config KongConfig) *KongClient {
+func NewKongClient(config KongConfig) (*KongClient, error) {
 	httpClient := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
-	return &KongClient{Config: config, client: httpClient}
+	client := &KongClient{Config: config, client: httpClient}
+
+	status, err := client.GetStatus()
+
+	if err != nil {
+		return nil, fmt.Errorf("error initializing Kong client: %e", err)
+	}
+
+	if !status.Database.Reachable {
+		return nil, fmt.Errorf("/status check returned, but Kong indicated that the database isn't reachable. This client is unlikely to work")
+	}
+
+	return client, nil
 }
 
 func (kongClient *KongClient) post(path string, payload interface{}, responseResource interface{}) error {
@@ -90,7 +103,7 @@ func (kongClient *KongClient) request(method string, path string, payload interf
 	if response.StatusCode >= 400 {
 		errorMessage := string(body[:])
 
-		return &KongHttpError{StatusCode: response.StatusCode, Message: errorMessage}
+		return &HttpError{StatusCode: response.StatusCode, Message: errorMessage}
 	}
 
 	if responseResource != nil {

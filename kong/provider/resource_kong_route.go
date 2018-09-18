@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -79,7 +79,7 @@ func resourceKongRoute() *schema.Resource {
 }
 
 func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	route, err := kongClient.CreateRoute(mapToApi(data))
 
@@ -93,7 +93,7 @@ func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	route, err := kongClient.GetRoute(data.Id())
 
@@ -122,7 +122,7 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKongRouteUpdate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	err := kongClient.UpdateRoute(mapToApi(data))
 
@@ -134,13 +134,13 @@ func resourceKongRouteUpdate(data *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	return kongClient.DeleteRoute(data.Id())
 }
 
-func mapToApi(data *schema.ResourceData) client.KongRoute {
-	return client.KongRoute{
+func mapToApi(data *schema.ResourceData) *kong.KongRoute {
+	return &kong.KongRoute{
 		Id:           data.Id(),
 		Methods:      toStringArray(data.Get("methods").([]interface{})),
 		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
@@ -148,7 +148,7 @@ func mapToApi(data *schema.ResourceData) client.KongRoute {
 		Paths:        toStringArray(data.Get("paths").([]interface{})),
 		StripPath:    data.Get("strip_path").(bool),
 		PreserveHost: data.Get("preserve_host").(bool),
-		Service: client.KongServiceReference{
+		Service: kong.KongServiceReference{
 			Id: data.Get("service_id").(string),
 		},
 	}

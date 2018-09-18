@@ -3,7 +3,7 @@ package test_util
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
@@ -11,7 +11,7 @@ import (
 
 func TestAccCheckGenericKongPluginDestroy(provider *schema.Provider, resourceType, resourceName, pluginName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		kong := provider.Meta().(*client.KongClient)
+		kong := provider.Meta().(*kong.KongClient)
 
 		for _, rs := range state.RootModule().Resources {
 			if rs.Type != resourceType {
@@ -34,7 +34,7 @@ func TestAccCheckGenericKongPluginDestroy(provider *schema.Provider, resourceTyp
 	}
 }
 
-func TestAccCheckKongPluginExists(provider *schema.Provider, resourceName string, output *client.KongPlugin) resource.TestCheckFunc {
+func TestAccCheckKongPluginExists(provider *schema.Provider, resourceName string, output *kong.KongPlugin) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		r, ok := state.RootModule().Resources[resourceName]
 
@@ -46,7 +46,7 @@ func TestAccCheckKongPluginExists(provider *schema.Provider, resourceName string
 			return fmt.Errorf("No id set for %s", resourceName)
 		}
 
-		kong := provider.Meta().(*client.KongClient)
+		kong := provider.Meta().(*kong.KongClient)
 
 		plugin, err := kong.GetPlugin(r.Primary.ID)
 
@@ -60,7 +60,7 @@ func TestAccCheckKongPluginExists(provider *schema.Provider, resourceName string
 	}
 }
 
-func TestAccKongPluginConfigAttributes(actualPlugin, expectedPlugin *client.KongPlugin) resource.TestCheckFunc {
+func TestAccKongPluginConfigAttributes(actualPlugin, expectedPlugin *kong.KongPlugin) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		expectedConfigJson, _ := json.Marshal(expectedPlugin.Config)
 		actualConfigJson, _ := json.Marshal(actualPlugin.Config)

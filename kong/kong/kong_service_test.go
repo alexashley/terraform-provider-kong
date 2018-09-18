@@ -1,4 +1,4 @@
-package client
+package kong
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 var kongClient *KongClient
 
 func init() {
-	kongClient = NewKongClient(KongConfig{
+	kongClient, _ = NewKongClient(KongConfig{
 		AdminApiUrl: "http://localhost:8001",
 	})
 }

@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -34,7 +34,7 @@ func resourceKongPluginIpHeaderRestriction() *schema.Resource {
 				"override_global": data.Get("override_global"),
 			}
 		},
-		MapApiModelToResource: func(plugin *client.KongPlugin, data *schema.ResourceData) {
+		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) {
 			pluginConfig := plugin.Config.(map[string]interface{})
 
 			data.Set("whitelist", toStringArray(pluginConfig["whitelist"].([]interface{})))

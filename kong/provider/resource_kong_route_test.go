@@ -2,7 +2,7 @@ package provider
 
 import (
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -14,7 +14,7 @@ func TestAccKongRoute_basic(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 	routePath := fmt.Sprintf("/kong-provider-acc-test-route-%s", acctest.RandString(5))
 
-	var route client.KongRoute
+	var route kong.KongRoute
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -25,7 +25,7 @@ func TestAccKongRoute_basic(t *testing.T) {
 				Config: testAccKongRouteConfig_basic(serviceName, routePath),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongRouteExists("kong_route.basic-route", &route),
-					testAccCheckKongRouteAttributes(&route, &client.KongRoute{
+					testAccCheckKongRouteAttributes(&route, &kong.KongRoute{
 						Protocols: []string{"http"},
 						Paths:     []string{routePath},
 						Methods:   []string{"GET", "PUT", "DELETE"},
@@ -52,7 +52,7 @@ func TestAccKongRoute_update(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 	routePath := fmt.Sprintf("/kong-provider-acc-test-route-%s", acctest.RandString(5))
 	updatedRoutePath := fmt.Sprintf("%s-update-%s", routePath, acctest.RandString(5))
-	var route client.KongRoute
+	var route kong.KongRoute
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -91,7 +91,7 @@ func TestAccKongRoute_host(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 	host := fmt.Sprintf("kong-provider-acc-test-route-%s.org", acctest.RandString(5))
 
-	var route client.KongRoute
+	var route kong.KongRoute
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -102,7 +102,7 @@ func TestAccKongRoute_host(t *testing.T) {
 				Config: testAccKongRouteConfig_host(serviceName, host),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongRouteExists("kong_route.host-route", &route),
-					testAccCheckKongRouteAttributes(&route, &client.KongRoute{
+					testAccCheckKongRouteAttributes(&route, &kong.KongRoute{
 						Hosts:     []string{host},
 						Protocols: []string{"http", "https"},
 					}),
@@ -119,7 +119,7 @@ func TestAccKongRoute_host(t *testing.T) {
 	})
 }
 
-func testAccCheckKongRouteExists(name string, output *client.KongRoute) resource.TestCheckFunc {
+func testAccCheckKongRouteExists(name string, output *kong.KongRoute) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		r, ok := state.RootModule().Resources[name]
 
@@ -131,7 +131,7 @@ func testAccCheckKongRouteExists(name string, output *client.KongRoute) resource
 			return fmt.Errorf("No id set for %s", name)
 		}
 
-		kong := testAccProvider.Meta().(*client.KongClient)
+		kong := testAccProvider.Meta().(*kong.KongClient)
 
 		route, err := kong.GetRoute(r.Primary.ID)
 
@@ -147,19 +147,19 @@ func testAccCheckKongRouteExists(name string, output *client.KongRoute) resource
 
 func testAccCheckKongRouteDestroy(name string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		kong := testAccProvider.Meta().(*client.KongClient)
+		client := testAccProvider.Meta().(*kong.KongClient)
 
 		for _, rs := range state.RootModule().Resources {
 			if rs.Type != "kong_route" {
 				continue
 			}
-			route, err := kong.GetRoute(state.RootModule().Resources[name].Primary.ID)
+			route, err := client.GetRoute(state.RootModule().Resources[name].Primary.ID)
 
 			if err == nil {
 				return fmt.Errorf("Route still exists: %s", route.Id)
 			}
 
-			kongError, ok := err.(*client.KongHttpError)
+			kongError, ok := err.(*kong.HttpError)
 
 			if !ok {
 				return err
@@ -176,7 +176,7 @@ func testAccCheckKongRouteDestroy(name string) resource.TestCheckFunc {
 	}
 }
 
-func testAccCheckKongRouteAttributes(actualRoute *client.KongRoute, expectedRoute *client.KongRoute) resource.TestCheckFunc {
+func testAccCheckKongRouteAttributes(actualRoute *kong.KongRoute, expectedRoute *kong.KongRoute) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		if !slicesAreEqual(actualRoute.Protocols, expectedRoute.Protocols) {

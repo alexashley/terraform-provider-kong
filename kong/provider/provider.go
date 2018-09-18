@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -32,7 +32,7 @@ func KongProvider() *schema.Provider {
 			adminApiUrl := data.Get("admin_api_url").(string)
 			rbacToken := data.Get("rbac_token").(string)
 
-			return client.NewKongClient(client.KongConfig{AdminApiUrl: adminApiUrl, RbacToken: rbacToken}), nil
+			return kong.NewKongClient(kong.KongConfig{AdminApiUrl: adminApiUrl, RbacToken: rbacToken})
 		},
 	}
 }

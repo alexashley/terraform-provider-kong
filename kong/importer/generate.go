@@ -1,10 +1,10 @@
-package main
+package importer
 
 import (
 	"context"
 	"flag"
 	"fmt"
-	kong "github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/google/subcommands"
 )
 
@@ -52,10 +52,16 @@ func (cmd *generateCommand) SetFlags(flags *flag.FlagSet) {
 func (cmd *generateCommand) Execute(_ context.Context, flags *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	fmt.Println("Generating Terraform config for: " + cmd.adminApiUrl)
 
-	c, _ := kong.NewKongClient(kong.KongConfig{
+	client, err := kong.NewKongClient(kong.KongConfig{
 		AdminApiUrl: cmd.adminApiUrl,
 		RbacToken:   cmd.rbacToken,
 	})
+
+	if err != nil {
+		return subcommands.ExitFailure
+	}
+
+	client.GetStatus()
 
 	return subcommands.ExitSuccess
 }

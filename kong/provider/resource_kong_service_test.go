@@ -2,7 +2,7 @@ package provider
 
 import (
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -13,7 +13,7 @@ import (
 func TestAccKongService_basic(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 
-	var service client.KongService
+	var service kong.KongService
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -24,7 +24,7 @@ func TestAccKongService_basic(t *testing.T) {
 				Config: testAccKongServiceConfig_basic(serviceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongServiceExists("kong_service.basic-service", &service),
-					testAccCheckKongServiceAttributes(&service, &client.KongService{
+					testAccCheckKongServiceAttributes(&service, &kong.KongService{
 						Name: serviceName,
 						Url:  "http://foobar.org:5555",
 					}),
@@ -38,7 +38,7 @@ func TestAccKongService_basic(t *testing.T) {
 
 func TestAccKongService_update(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
-	var service client.KongService
+	var service kong.KongService
 
 	updatedServiceName := fmt.Sprintf("%s-update-%s", serviceName, acctest.RandString(5))
 	updatedUrl := fmt.Sprintf("http://%s.com", acctest.RandString(10))
@@ -52,7 +52,7 @@ func TestAccKongService_update(t *testing.T) {
 				Config: testAccKongServiceConfig_basic(serviceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongServiceExists("kong_service.basic-service", &service),
-					testAccCheckKongServiceAttributes(&service, &client.KongService{
+					testAccCheckKongServiceAttributes(&service, &kong.KongService{
 						Name: serviceName,
 						Url:  "http://foobar.org:5555",
 					}),
@@ -64,7 +64,7 @@ func TestAccKongService_update(t *testing.T) {
 				Config: testAccKongServiceConfig_update(updatedServiceName, updatedUrl),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongServiceExists("kong_service.basic-service", &service),
-					testAccCheckKongServiceAttributes(&service, &client.KongService{
+					testAccCheckKongServiceAttributes(&service, &kong.KongService{
 						Name: updatedServiceName,
 						Url:  updatedUrl,
 					}),
@@ -76,7 +76,7 @@ func TestAccKongService_update(t *testing.T) {
 				Config: testAccKongServiceConfig_basic(serviceName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongServiceExists("kong_service.basic-service", &service),
-					testAccCheckKongServiceAttributes(&service, &client.KongService{
+					testAccCheckKongServiceAttributes(&service, &kong.KongService{
 						Name: serviceName,
 						Url:  "http://foobar.org:5555",
 					}),
@@ -91,8 +91,8 @@ func TestAccKongService_update(t *testing.T) {
 func TestAccKongService_defaults(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 
-	var service client.KongService
-	expectedService := client.KongService{
+	var service kong.KongService
+	expectedService := kong.KongService{
 		Name:           serviceName,
 		ConnectTimeout: 60000,
 		Retries:        5,
@@ -122,8 +122,8 @@ func TestAccKongService_defaults(t *testing.T) {
 func TestAccKongService_override_defaults(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 
-	var service client.KongService
-	expectedService := client.KongService{
+	var service kong.KongService
+	expectedService := kong.KongService{
 		Name:           serviceName,
 		ConnectTimeout: 30000,
 		Retries:        2,
@@ -153,7 +153,7 @@ func TestAccKongService_override_defaults(t *testing.T) {
 func TestAccKongService_http_should_not_surface_port_80_in_url(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 
-	var service client.KongService
+	var service kong.KongService
 
 	httpUrl := fmt.Sprintf("http://%s.com", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
@@ -176,7 +176,7 @@ func TestAccKongService_http_should_not_surface_port_80_in_url(t *testing.T) {
 func TestAccKongService_https_should_not_surface_port_443_in_url(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 
-	var service client.KongService
+	var service kong.KongService
 
 	httpsUrl := fmt.Sprintf("https://%s.org", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
@@ -196,7 +196,7 @@ func TestAccKongService_https_should_not_surface_port_443_in_url(t *testing.T) {
 	})
 }
 
-func testAccCheckKongServiceExists(name string, output *client.KongService) resource.TestCheckFunc {
+func testAccCheckKongServiceExists(name string, output *kong.KongService) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		r, ok := state.RootModule().Resources[name]
 
@@ -208,7 +208,7 @@ func testAccCheckKongServiceExists(name string, output *client.KongService) reso
 			return fmt.Errorf("No id set for %s", name)
 		}
 
-		kong := testAccProvider.Meta().(*client.KongClient)
+		kong := testAccProvider.Meta().(*kong.KongClient)
 
 		service, err := kong.GetService(r.Primary.ID)
 
@@ -224,19 +224,19 @@ func testAccCheckKongServiceExists(name string, output *client.KongService) reso
 
 func testAccCheckKongServiceDestroy(name string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		kong := testAccProvider.Meta().(*client.KongClient)
+		client := testAccProvider.Meta().(*kong.KongClient)
 
 		for _, rs := range state.RootModule().Resources {
 			if rs.Type != "kong_service" {
 				continue
 			}
-			service, err := kong.GetService(state.RootModule().Resources[name].Primary.ID)
+			service, err := client.GetService(state.RootModule().Resources[name].Primary.ID)
 
 			if err == nil {
 				return fmt.Errorf("Service still exists: %s", service.Id)
 			}
 
-			kongError, ok := err.(*client.KongHttpError)
+			kongError, ok := err.(*kong.HttpError)
 
 			if !ok {
 				return err
@@ -253,7 +253,7 @@ func testAccCheckKongServiceDestroy(name string) resource.TestCheckFunc {
 	}
 }
 
-func testAccCheckKongServiceAttributes(actualService *client.KongService, expectedService *client.KongService) resource.TestCheckFunc {
+func testAccCheckKongServiceAttributes(actualService *kong.KongService, expectedService *kong.KongService) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if actualService.Name != expectedService.Name {
 			return test_util.ExpectedAndActualError("Kong service name is wrong", expectedService.Name, actualService.Name)
@@ -313,7 +313,7 @@ resource "kong_service" "https-service" {
 }`, serviceName, url)
 }
 
-func testAccKongServiceConfig_overrideDefaults(service *client.KongService) string {
+func testAccKongServiceConfig_overrideDefaults(service *kong.KongService) string {
 	return fmt.Sprintf(`
 resource "kong_service" "override-defaults-service" {
 	name = "%s"

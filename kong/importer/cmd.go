@@ -1,4 +1,4 @@
-package main
+package importer
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main() {
+func RunCli() {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")

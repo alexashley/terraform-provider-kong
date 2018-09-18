@@ -1,4 +1,4 @@
-package client
+package kong
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 
 const servicesPath = "/services"
 
-func (kongClient *KongClient) CreateService(serviceToCreate KongService) (*KongService, error) {
+func (kongClient *KongClient) CreateService(serviceToCreate *KongService) (*KongService, error) {
 	var newService KongService
 	err := kongClient.post(servicesPath, serviceToCreate, &newService)
 
@@ -18,7 +18,7 @@ func (kongClient *KongClient) CreateService(serviceToCreate KongService) (*KongS
 	return &newService, nil
 }
 
-func (kongClient *KongClient) UpdateService(serviceToUpdate KongService) error {
+func (kongClient *KongClient) UpdateService(serviceToUpdate *KongService) error {
 	return kongClient.put(servicePath(serviceToUpdate.Id), serviceToUpdate)
 }
 

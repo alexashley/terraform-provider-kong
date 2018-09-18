@@ -2,7 +2,7 @@ package provider
 
 import (
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/alexashley/terraform-provider-kong/kong/provider/test_util"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -31,7 +31,7 @@ func randomRequestTransformerCrud(prefix string, includeUri bool) *requestTransf
 }
 
 func TestAccKongPluginRequestTransformerAdvanced_basic(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	expectedMethod := test_util.PickOne([]string{"GET", "PUT", "POST", "DELETE", "PATCH"})
 	expectedPath := fmt.Sprintf("/kong-provider-test-acc-%s", acctest.RandString(5))
@@ -53,7 +53,7 @@ func TestAccKongPluginRequestTransformerAdvanced_basic(t *testing.T) {
 						"kong_plugin_request_transformer_advanced.test",
 						&plugin,
 					),
-					test_util.TestAccKongPluginConfigAttributes(&plugin, &client.KongPlugin{
+					test_util.TestAccKongPluginConfigAttributes(&plugin, &kong.KongPlugin{
 						Config: map[string]interface{}{
 							"http_method": expectedMethod,
 							"replace": map[string]interface{}{
@@ -97,7 +97,7 @@ func TestAccKongPluginRequestTransformerAdvanced_basic(t *testing.T) {
 }
 
 func TestAccKongPluginRequestTransformerAdvanced_update(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	expectedMethod := test_util.PickOne([]string{"GET", "PUT", "POST", "DELETE", "PATCH"})
 	expectedPath := fmt.Sprintf("/kong-provider-test-acc-%s", acctest.RandString(5))
@@ -166,7 +166,7 @@ func TestAccKongPluginRequestTransformerAdvanced_update(t *testing.T) {
 }
 
 func TestAccKongPluginRequestTransformerAdvanced_all(t *testing.T) {
-	var plugin client.KongPlugin
+	var plugin kong.KongPlugin
 
 	expectedMethod := test_util.PickOne([]string{"GET", "PUT", "POST", "DELETE", "PATCH"})
 
@@ -211,7 +211,7 @@ func TestAccKongPluginRequestTransformerAdvanced_all(t *testing.T) {
 						"kong_plugin_request_transformer_advanced.test",
 						&plugin,
 					),
-					test_util.TestAccKongPluginConfigAttributes(&plugin, &client.KongPlugin{
+					test_util.TestAccKongPluginConfigAttributes(&plugin, &kong.KongPlugin{
 						Config: map[string]interface{}{
 							"http_method": expectedMethod,
 							"replace": map[string]interface{}{

@@ -3,7 +3,7 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/structure"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -42,10 +42,10 @@ func resourceKongPlugin() *schema.Resource {
 				ConflictsWith: []string{"config_json"},
 			},
 			"config_json": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
-				ConflictsWith: []string{"config"},
-				ValidateFunc: validation.ValidateJsonString,
+				Type:             schema.TypeString,
+				Optional:         true,
+				ConflictsWith:    []string{"config"},
+				ValidateFunc:     validation.ValidateJsonString,
 				DiffSuppressFunc: structure.SuppressJsonDiff,
 			},
 			"enabled": &schema.Schema{
@@ -62,7 +62,7 @@ func resourceKongPlugin() *schema.Resource {
 }
 
 func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	config, err := getPluginConfig(data)
 
@@ -70,7 +70,7 @@ func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	plugin, err := kongClient.CreatePlugin(client.KongPlugin{
+	plugin, err := kongClient.CreatePlugin(&kong.KongPlugin{
 		ServiceId:  data.Get("service_id").(string),
 		RouteId:    data.Get("route_id").(string),
 		ConsumerId: data.Get("consumer_id").(string),
@@ -89,7 +89,7 @@ func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error
 }
 
 func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	plugin, err := kongClient.GetPlugin(data.Id())
 
@@ -134,7 +134,7 @@ func resourceKongPluginUpdate(data *schema.ResourceData, meta interface{}) error
 }
 
 func resourceKongPluginDelete(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	return kongClient.DeletePlugin(data.Id())
 }

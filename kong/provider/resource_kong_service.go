@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/alexashley/terraform-provider-kong/kong/client"
+	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -56,11 +56,11 @@ func resourceKongService() *schema.Resource {
 }
 
 func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	kongService := mapToApiClient(data)
 
-	service, err := kongClient.CreateService(kongService)
+	service, err := kongClient.CreateService(&kongService)
 
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func resourceKongServiceCreate(data *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	service, err := kongClient.GetService(data.Id())
 
@@ -99,10 +99,10 @@ func resourceKongServiceRead(data *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceKongServiceUpdate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	serviceToUpdate := mapToApiClient(data)
-	err := kongClient.UpdateService(serviceToUpdate)
+	err := kongClient.UpdateService(&serviceToUpdate)
 
 	if err != nil {
 		return err
@@ -112,13 +112,13 @@ func resourceKongServiceUpdate(data *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceKongServiceDelete(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*client.KongClient)
+	kongClient := meta.(*kong.KongClient)
 
 	return kongClient.DeleteService(data.Id())
 }
 
-func mapToApiClient(data *schema.ResourceData) client.KongService {
-	return client.KongService{
+func mapToApiClient(data *schema.ResourceData) kong.KongService {
+	return kong.KongService{
 		Id:             data.Id(),
 		Name:           data.Get("name").(string),
 		Url:            data.Get("url").(string),

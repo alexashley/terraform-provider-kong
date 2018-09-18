@@ -12,7 +12,7 @@ testacc:
 	TF_ACC=1 KONG_ADMIN_API_URL=${KONG} go test ./kong/provider -v
 
 testapi:
-	go test ./kong/client -v
+	go test ./kong/kong -v
 
 example: build
 	terraform init example

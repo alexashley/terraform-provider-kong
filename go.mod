@@ -5,6 +5,7 @@ require (
 	github.com/aws/aws-sdk-go v1.15.25 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/google/subcommands v0.0.0-20180618214453-5bae204cdfb2
 	github.com/hashicorp/go-cleanhttp v0.5.0 // indirect
 	github.com/hashicorp/go-getter v0.0.0-20180809191950-4bda8fa99001 // indirect
 	github.com/hashicorp/go-hclog v0.0.0-20180828044259-75ecd6e6d645 // indirect
