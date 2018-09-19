@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -119,6 +121,88 @@ func TestAccKongRoute_host(t *testing.T) {
 	})
 }
 
+func TestAccKongRoute_validate_protocols(t *testing.T) {
+	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
+	invalidProtocol := acctest.RandString(10)
+	config := fmt.Sprintf(`
+resource "kong_service" "test" {
+	name = "%s",
+	url = "https://foobar.org"
+}
+
+resource "kong_route" "invalid-protocol-route" {
+	service_id = "${kong_service.test.id}"
+
+	paths = ["/foo"]
+	protocols = ["%s"]
+}`, serviceName, invalidProtocol)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("The supplied protocols are not supported by Kong: " + invalidProtocol),
+			},
+		},
+	})
+}
+
+func TestAccKongRoute_validate_methods(t *testing.T) {
+	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
+	invalidMethods := []string{acctest.RandString(10), acctest.RandString(5)}
+
+	config := fmt.Sprintf(`
+resource "kong_service" "test" {
+	name = "%s"
+	url = "http://foobar.org"
+}
+
+resource "kong_route" "invalid-methods-route" {
+	service_id = "${kong_service.test.id}"
+
+	paths = ["/foobar"]
+	methods = ["%s", "%s"]
+}`, serviceName, invalidMethods[0], invalidMethods[1])
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile(fmt.Sprintf("Invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))),
+			},
+		},
+	})
+}
+
+func TestAccKongRoute_validate_config(t *testing.T) {
+	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
+
+	config := fmt.Sprintf(`
+resource "kong_service" "test" {
+	name = "%s"
+	url = "http://foobar.org"
+}
+
+resource "kong_route" "invalid-route" {
+	service_id = "${kong_service.test.id}"
+}`, serviceName)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("At least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route."),
+			},
+		},
+	})
+}
+
 func testAccCheckKongRouteExists(name string, output *kong.KongRoute) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		r, ok := state.RootModule().Resources[name]
@@ -131,9 +215,9 @@ func testAccCheckKongRouteExists(name string, output *kong.KongRoute) resource.T
 			return fmt.Errorf("No id set for %s", name)
 		}
 
-		kong := testAccProvider.Meta().(*kong.KongClient)
+		client := testAccProvider.Meta().(*kong.KongClient)
 
-		route, err := kong.GetRoute(r.Primary.ID)
+		route, err := client.GetRoute(r.Primary.ID)
 
 		if err != nil {
 			return err

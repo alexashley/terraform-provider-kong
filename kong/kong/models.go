@@ -82,3 +82,9 @@ type KongStatus struct {
 	Server   KongServerStatus   `json:"server"`
 	Database KongDatabaseStatus `json:"database"`
 }
+
+type KongConsumer struct {
+	Id       string `json:"id,omitempty"`
+	Username string `json:"username,omitempty"`
+	CustomId string `json:"custom_id,omitempty"`
+}

@@ -1,9 +1,24 @@
 package provider
 
 import (
+	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
+	"strings"
 )
+
+var supportedProtocols = []string{"http", "https"}
+var supportedMethods = []string{
+	"GET",
+	"PUT",
+	"POST",
+	"DELETE",
+	"PATCH",
+	"HEAD",
+	"OPTIONS",
+	"TRACE",
+	"CONNECT",
+}
 
 func resourceKongRoute() *schema.Resource {
 	return &schema.Resource{
@@ -15,61 +30,61 @@ func resourceKongRoute() *schema.Resource {
 			State: importResourceIfUuidIsValid,
 		},
 		Schema: map[string]*schema.Schema{
-			"protocols": &schema.Schema{
+			"protocols": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				DefaultFunc: func() (interface{}, error) {
-					return []string{"http", "https"}, nil
+					return supportedProtocols, nil
 				},
 				Optional: true,
 				Computed: true,
 			},
-			"methods": &schema.Schema{
+			"methods": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
 			},
-			"hosts": &schema.Schema{
+			"hosts": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
 			},
-			"paths": &schema.Schema{
+			"paths": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
 			},
-			"strip_path": &schema.Schema{
+			"strip_path": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"preserve_host": &schema.Schema{
+			"preserve_host": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"service_id": &schema.Schema{
+			"service_id": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"created_at": &schema.Schema{
+			"created_at": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"updated_at": &schema.Schema{
+			"updated_at": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"regex_priority": &schema.Schema{
+			"regex_priority": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,
@@ -79,9 +94,13 @@ func resourceKongRoute() *schema.Resource {
 }
 
 func resourceKongRouteCreate(data *schema.ResourceData, meta interface{}) error {
+	if err := validateRouteResource(data); err != nil {
+		return err
+	}
+
 	kongClient := meta.(*kong.KongClient)
 
-	route, err := kongClient.CreateRoute(mapToApi(data))
+	route, err := kongClient.CreateRoute(mapToApiRoute(data))
 
 	if err != nil {
 		return err
@@ -124,7 +143,7 @@ func resourceKongRouteRead(data *schema.ResourceData, meta interface{}) error {
 func resourceKongRouteUpdate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	err := kongClient.UpdateRoute(mapToApi(data))
+	err := kongClient.UpdateRoute(mapToApiRoute(data))
 
 	if err != nil {
 		return err
@@ -139,7 +158,7 @@ func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error 
 	return kongClient.DeleteRoute(data.Id())
 }
 
-func mapToApi(data *schema.ResourceData) *kong.KongRoute {
+func mapToApiRoute(data *schema.ResourceData) *kong.KongRoute {
 	return &kong.KongRoute{
 		Id:           data.Id(),
 		Methods:      toStringArray(data.Get("methods").([]interface{})),
@@ -152,4 +171,29 @@ func mapToApi(data *schema.ResourceData) *kong.KongRoute {
 			Id: data.Get("service_id").(string),
 		},
 	}
+}
+
+func validateRouteResource(data *schema.ResourceData) error {
+	protocols := data.Get("protocols")
+	invalidProtocols, _ := filterBySet(protocols, supportedProtocols)
+
+	if len(invalidProtocols) > 0 {
+		return fmt.Errorf("The supplied protocols are not supported by Kong: %s", strings.Join(invalidProtocols, ", "))
+	}
+	methods := data.Get("methods").([]interface{})
+
+	invalidMethods, _ := filterBySet(methods, supportedMethods)
+
+	if len(invalidMethods) > 0 {
+		return fmt.Errorf("Invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))
+	}
+
+	paths := data.Get("paths").([]interface{})
+	hosts := data.Get("hosts").([]interface{})
+
+	if len(paths) == 0 && len(hosts) == 0 && len(methods) == 0 {
+		return fmt.Errorf("At least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route.")
+	}
+
+	return nil
 }

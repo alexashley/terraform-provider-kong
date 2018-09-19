@@ -27,7 +27,7 @@ type KongClient struct {
 
 func NewKongClient(config KongConfig) (*KongClient, error) {
 	httpClient := &http.Client{
-		Timeout: time.Second * 10,
+		Timeout: time.Second * 60,
 	}
 
 	client := &KongClient{Config: config, client: httpClient}

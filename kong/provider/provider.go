@@ -13,6 +13,7 @@ func KongProvider() *schema.Provider {
 			"kong_plugin":                       resourceKongPlugin(),
 			"kong_plugin_ip_header_restriction": resourceKongPluginIpHeaderRestriction(),
 			"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
+			"kong_consumer": resourceKongConsumer(),
 		},
 		Schema: map[string]*schema.Schema{
 			"admin_api_url": {
