@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/structure"
 	"github.com/hashicorp/terraform/helper/validation"
+	"os"
+	"strings"
 )
 
 func resourceKongPlugin() *schema.Resource {
@@ -19,41 +21,56 @@ func resourceKongPlugin() *schema.Resource {
 			State: importResourceIfUuidIsValid, // TODO: change import to always import config_json over config
 		},
 		Schema: map[string]*schema.Schema{
-			"service_id": &schema.Schema{
+			"service_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"route_id": &schema.Schema{
+			"route_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"consumer_id": &schema.Schema{
+			"consumer_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+				ValidateFunc: func(i interface{}, s string) (warnings []string, errors []error) {
+					name := i.(string)
+
+					pluginResourceName, ok := pluginIsAResource(name)
+
+					escapeHatchEnvName := "TF_KONG_ALLOW_GENERIC_PLUGIN_" + strings.ToUpper(strings.Replace(name, "-", "_", -1))
+
+					if ok && os.Getenv(escapeHatchEnvName) == "" {
+						errorMessage := fmt.Errorf("Plugin %s has a resource implementation: %s. This resource should be used instead.", name, pluginResourceName)
+
+						errors = append(errors, errorMessage)
+					}
+
+					return warnings, errors
+				},
 			},
-			"config": &schema.Schema{
+			"config": {
 				Type:          schema.TypeMap,
 				Elem:          schema.TypeString,
 				Optional:      true,
 				ConflictsWith: []string{"config_json"},
 			},
-			"config_json": &schema.Schema{
+			"config_json": {
 				Type:             schema.TypeString,
 				Optional:         true,
 				ConflictsWith:    []string{"config"},
 				ValidateFunc:     validation.ValidateJsonString,
 				DiffSuppressFunc: structure.SuppressJsonDiff,
 			},
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"created_at": &schema.Schema{
+			"created_at": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -156,4 +173,13 @@ func getPluginConfig(data *schema.ResourceData) (map[string]interface{}, error) 
 	}
 
 	return config, nil
+}
+
+func pluginIsAResource(pluginName string) (string, bool) {
+	snakeCaseName := strings.Replace(pluginName, "-", "_", -1)
+	resourceName := "kong_plugin_" + snakeCaseName
+
+	_, ok := pluginResourcesMap[resourceName]
+
+	return resourceName, ok
 }

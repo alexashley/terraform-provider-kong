@@ -5,16 +5,21 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
+var resourcesMap = map[string]*schema.Resource{
+	"kong_service":  resourceKongService(),
+	"kong_route":    resourceKongRoute(),
+	"kong_plugin":   resourceKongPlugin(),
+	"kong_consumer": resourceKongConsumer(),
+}
+
+var pluginResourcesMap = map[string]*schema.Resource{
+	"kong_plugin_ip_header_restriction":        resourceKongPluginIpHeaderRestriction(),
+	"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
+}
+
 func KongProvider() *schema.Provider {
 	return &schema.Provider{
-		ResourcesMap: map[string]*schema.Resource{
-			"kong_service":                      resourceKongService(),
-			"kong_route":                        resourceKongRoute(),
-			"kong_plugin":                       resourceKongPlugin(),
-			"kong_plugin_ip_header_restriction": resourceKongPluginIpHeaderRestriction(),
-			"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
-			"kong_consumer": resourceKongConsumer(),
-		},
+		ResourcesMap: mergeResourceMaps(resourcesMap, pluginResourcesMap),
 		Schema: map[string]*schema.Schema{
 			"admin_api_url": {
 				Type:        schema.TypeString,
@@ -36,4 +41,18 @@ func KongProvider() *schema.Provider {
 			return kong.NewKongClient(kong.KongConfig{AdminApiUrl: adminApiUrl, RbacToken: rbacToken})
 		},
 	}
+}
+
+func mergeResourceMaps(a, b map[string]*schema.Resource) map[string]*schema.Resource {
+	combined := make(map[string]*schema.Resource)
+
+	for resourceName, resourceValue := range a {
+		combined[resourceName] = resourceValue
+	}
+
+	for resourceName, resourceValue := range b {
+		combined[resourceName] = resourceValue
+	}
+
+	return combined
 }

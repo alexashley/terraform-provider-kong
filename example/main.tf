@@ -13,6 +13,17 @@ resource "kong_route" "mock" {
     "/mock"]
 }
 
+// uncomment this to see it fail with an error:
+//resource "kong_plugin" "test" {
+//  service_id = "${kong_service.mockbin.id}"
+//  name = "ip-header-restriction"
+//  config_json =<<EOF
+//{
+//  "whitelist": ["123", "456"]
+//}
+//EOF
+//}
+
 resource "kong_plugin_request_transformer_advanced" "request-transformer-plugin-service" {
   service_id = "${kong_service.mockbin.id}"
   add_headers = ["x-parent-resource:service"]
