@@ -3,7 +3,14 @@
 
 A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
-## Resources
+## Features
+
+- Supports Kong's enterprise-edition RBAC authentication
+- Resources for individual plugins, including EE-only plugins 
+- Import individual consumers, services, routes, or plugins
+- [WIP] Bulk import tool to ease migrating existing infrastructure into Terraform 
+
+## CE Resources
 
 ### Provider
 ```hcl
@@ -67,12 +74,113 @@ Existing Kong routes can be imported into Terraform:
 
 `terraform import kong_route.name-of-route-to-import <route UUID>`
 
+### Consumers (`kong_consumer`)
+A representation of Kong's [consumer object](https://docs.konghq.com/0.14.x/admin-api/#consumer-object).
+
+#### Schema
+| field       | explanation                                                                                     | type     | default |
+|-------------|-------------------------------------------------------------------------------------------------|----------|---------|
+| `username`  | A unique username for the consumer. Either the username or the custom_id (or both) must be set. | `string` | N/A     |
+| `custom_id` | A unique identifier for the consumer.                                                           | `string` | N/A     |
+
+#### Example
+
+```hcl
+resource "kong_consumer" "crocodile-hunter" {
+  username = "steve-irwin"
+}
+```
+
+#### Import 
+Existing Kong consumers can also be imported into Terraform state:
+
+`terraform import kong_consumer.crocodile-hunter <consumer UUID>`
+
 ### Plugins (`kong_plugin`)
+A resource for Kong's [plugin object](https://docs.konghq.com/0.14.x/admin-api/#plugin-object).
+Certain plugins are available as resources and should be used instead of this generic resource, as they provide in-depth validation, as well as greater type safety and ease of use.  If there's a specific resource for the plugin you're adding, the provider will require you to use that resource instead of the generic plugin.
 
-### Consumers
+Plugins can run for a service, route, consumer or globally; if multiple of the same plugin are configured, only one will run for a request, generally the most specific configuration. There's more information on [plugin precedence](https://docs.konghq.com/0.14.x/admin-api/#precedence) in the docs.
 
+#### Schema
+| field         | explanation                                                                                                                                                                                                                                  | type                | default |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|---------|
+| `service_id`  | The service for which the plugin will run.                                                                                                                                                                                                   | `string`            | N/A     |
+| `route_id`    | The route for which the plugin will run.                                                                                                                                                                                                     | `string`            | N/A     |
+| `consumer_id` | The consumer for which the plugin will run. Not supported by all plugins.                                                                                                                                                                    | `string`            | N/A     |
+| `name`        | The plugin name, e.g. `basic-auth`                                                                                                                                                                                                           | `string`            | N/A     |
+| `config`      | An object representing the plugin's configuration.  At this time it's not possible to represent all valid plugin configurations with Terraform. Should this be a problem, you can use a specific plugin resource or the `config_json` field. | `map[string]string` | N/A     |
+| `config_json` | A JSON string containing the plugin's configuration. Can't be used with `config`                                                                                                                                                             | `string`            | N/A     |
+| `enabled`     | Turns the plugin on or off.                                                                                                                                                                                                                  | `bool`              | `true`   |
+
+Note that if you use the `config_json` field you'll need to provide the full plugin configuration, including defaults from Kong; otherwise, Terraform will detect that there changes that need to be applied.
+
+#### Example
+
+```hcl
+resource "kong_plugin" "basic-auth-plugin" {
+  route_id = "${kong_route.foo-route.id}"
+  name = "basic-auth"
+  config_json = <<EOF
+{
+  "anonymous": "",
+  "hide_credentials": true
+}
+EOF
+}
+```
+
+#### Import
+Existing plugins can be imported:
+`terraform import kong_plugin.basic-auth-plugin <plugin UUID>`
+
+
+## EE Resources
+
+### Request Transformer Advanced (`kong_plugin_request_transformer_advanced`)
+A resource for the [`request-transformer-advanced`](https://docs.konghq.com/hub/kong-inc/request-transformer-advanced/) plugin.
+
+#### Schema
+
+In addition to the fields below, the resource also shares most of the `kong_plugin` config, with the exception of the `config` and `config_json` fields.
+
+| field                 | explanation                                                                                                                       | type       | default |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------|------------|---------|
+| `http_method`         | Method that will be used for the upstream request.                                                                                | `string`   | N/A     |
+| `remove_headers`      | Header key:value pairs to scrub from the request                                                                                  | `[]string` | N/A     |
+| `remove_querystring`  | Querystring key:value pairs to scrub from the request                                                                             | `[]string` | N/A     |
+| `remove_body_params`  | Body parameters to scrub from the request.                                                                                        | `[]string` | N/A     |
+| `replace_headers`     | Header key:value pairs. If the header is set, its value will be replaced. Otherwise it will be ignored                            | `[]string` | N/A     |
+| `replace_uri`         | Rewrites the path to the upstream request.                                                                                        | `string`   | N/A     |
+| `replace_body_params` | Body parameters to replace in the request. If the param is set, its value will be replaced. Otherwise it will be ignored.         | `[]string` | `true   |
+| `rename_headers`      | Header key:value pairs. If the header is set, it will be renamed. The value will remain unchanged.                                | `[]string` | N/A     |
+| `rename_querystring`  | Querystring key:value pairs.  If the querystring is in the request, the field will be renamed but the value will remain the same. | `[]string` | N/A     |
+| `rename_body_params`  | Body parameters to rename in the request.                                                                                         | `[]string` | N/A     |
+| `add_querystring`     | Querystring key:value pairs to add to the request. Ignored if the query is already set.                                           | `[]string` | N/A     |
+| `add_headers`         | Header key:value pairs to add to the request. Ignored if the header is already set.                                               | `[]string` | N/A     |
+| `add_body_params`     | Body parameters to add to the request. Ignored if already set.                                                                    | `[]string` | N/A     |
+| `append_headers`      | Header key:value pairs to append to the request. The header is added if it's not already present                                  | `[]string` | N/A     |
+| `append_querystring` | Querystring key:value pairs to append to the request. The query is added if it's not already present | `[]string` | N/A
+| `append_body_params` | Body parameters to append to the request. The parameter is set if it's not already in the request | `[]string` | N/A
+
+#### Example
+```hcl
+resource "kong_plugin_request_transformer_advanced" "request-transformer-plugin-service" {
+  service_id = "${kong_service.mockbin.id}"
+  add_headers = ["x-parent-resource:service"]
+  http_method = "GET",
+  replace_uri = "/foobar"
+}
+```
+
+#### Import
+
+To import an existing instance of the plugin:
+`terraform import kong_plugin_request_transformer_advanced.req-transformer <plugin UUID>`
 
 ### Admins/RBAC
+
+TBD
 
 ### Unsupported Resources
 
