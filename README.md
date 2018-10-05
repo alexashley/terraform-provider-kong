@@ -10,15 +10,15 @@ A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 - Import individual consumers, services, routes, or plugins
 - [WIP] Bulk import tool to ease migrating existing infrastructure into Terraform 
 
-## CE Resources
-
-### Provider
+## Provider
 ```hcl
 provider "kong" {
   admin_api_url = "http://localhost:8001"
   rbac_token = "foobar" // Only available with the enterprise edition
 }
 ```
+
+## Kong Resources
 
 ### Services (`kong_service`)
 A representation of Kong's [service object](https://docs.konghq.com/0.14.x/admin-api/#service-object).
@@ -135,7 +135,7 @@ Existing plugins can be imported:
 `terraform import kong_plugin.basic-auth-plugin <plugin UUID>`
 
 
-## EE Resources
+## Kong Enterprise Resources
 
 ### Request Transformer Advanced (`kong_plugin_request_transformer_advanced`)
 A resource for the [`request-transformer-advanced`](https://docs.konghq.com/hub/kong-inc/request-transformer-advanced/) plugin.
