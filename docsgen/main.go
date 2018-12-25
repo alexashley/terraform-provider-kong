@@ -198,6 +198,9 @@ func generateDocs(resources []Resource) error {
 		index.Resources = append(index.Resources, r.Name)
 	}
 
+	sort.Slice(index.Resources, func(i,j int) bool {
+		return index.Resources[i] < index.Resources[j]
+	})
 	indexFile, err := os.Create(fmt.Sprintf("%s/index.md", OutputDir))
 
 	if err != nil {
@@ -227,6 +230,10 @@ func main() {
 
 	for _, warning := range warnings {
 		fmt.Printf("- %s", warning)
+	}
+
+	if len(warnings) > 0 {
+		os.Exit(1)
 	}
 
 	err := generateDocs(resources)
