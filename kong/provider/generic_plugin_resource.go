@@ -18,23 +18,28 @@ type GenericPluginResource struct {
 
 var defaultPluginSchema = map[string]*schema.Schema{
 	"service_id": {
+		Description: "Unique identifier of the associated service.",
 		Type:     schema.TypeString,
 		Optional: true,
 	},
 	"route_id": {
+		Description: "Unique identifier of the associated route.",
 		Type:     schema.TypeString,
 		Optional: true,
 	},
 	"consumer_id": {
+		Description: "Unique identifier of the consumer for which this plugin will run. Not all plugins allow consumers",
 		Type:     schema.TypeString,
 		Optional: true,
 	},
 	"enabled": {
+		Description: "Toggle whether the plugin will run",
 		Type:     schema.TypeBool,
 		Optional: true,
 		Default:  true,
 	},
 	"created_at": {
+		Description: "Unix timestamp representing when the plugin was created.",
 		Type:     schema.TypeInt,
 		Computed: true,
 	},

@@ -1,0 +1,13 @@
+description: |
+  A representation of Kong's [route object](https://docs.konghq.com/0.14.x/admin-api/#route-object).
+  Services can have many routes, but a route corresponds to just one service.
+
+  For more information on `regex_priority`, see the [Kong docs](https://docs.konghq.com/0.14.x/proxy/#evaluation-order).
+example: |
+  resource "kong_route" "mock" {
+    service_id = "${kong_service.mockbin.id}"
+    paths = ["/mock"]
+  }
+import: |
+  Existing Kong routes can be imported into Terraform:
+  `terraform import kong_route.name-of-route-to-import <route UUID>`

@@ -15,41 +15,49 @@ func resourceKongService() *schema.Resource {
 			State: importResourceIfUuidIsValid,
 		},
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+			"name": {
+				Description: "The service name.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
-			"url": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+			"url": {
+				Description: "The url for the service. It encapsulates protocol, host, port and path",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
-			"created_at": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
+			"created_at": {
+				Description: "Unix timestamp representing the time the service was created.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
-			"updated_at": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
+			"updated_at": {
+				Description: "Unix timestamp for the last time the service was updated.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
-			"connect_timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  60000,
+			"connect_timeout": {
+				Description: "Time in milliseconds to connect to the upstream server.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     60000,
 			},
-			"retries": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  5,
+			"retries": {
+				Description: "Number of times Kong will try to proxy if there's an error.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     5,
 			},
-			"read_timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  60000,
+			"read_timeout": {
+				Description: "Time in milliseconds between two read operations to the upstream server.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     60000,
 			},
-			"write_timeout": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  60000,
+			"write_timeout": {
+				Description: "Time in milliseconds between two successive write operations to the upstream server.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     60000,
 			},
 		},
 	}

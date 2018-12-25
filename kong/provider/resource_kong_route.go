@@ -31,6 +31,7 @@ func resourceKongRoute() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"protocols": {
+				Description: "Protocols that Kong will proxy to this route",
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -42,6 +43,7 @@ func resourceKongRoute() *schema.Resource {
 				Computed: true,
 			},
 			"methods": {
+				Description: "HTTP verbs that Kong will proxy to this route",
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -49,6 +51,7 @@ func resourceKongRoute() *schema.Resource {
 				Optional: true,
 			},
 			"hosts": {
+				Description: "Host header values that should be matched to this route.",
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -56,6 +59,7 @@ func resourceKongRoute() *schema.Resource {
 				Optional: true,
 			},
 			"paths": {
+				Description: "List of path prefixes that will match this route",
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -63,28 +67,34 @@ func resourceKongRoute() *schema.Resource {
 				Optional: true,
 			},
 			"strip_path": {
+				Description: " If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request.",
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
 			"preserve_host": {
+				Description: " If the route is matched by the `Host` header, this flag indicates if the `Host` header should be set to the matched value.",
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
 			"service_id": {
+				Description: "Unique identifier of the associated service.",
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			"created_at": {
+				Description: "Unix timestamp of creation date.",
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"updated_at": {
+				Description: "Unix timestamp of last edit date.",
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"regex_priority": {
+				Description: "Determines the order that paths defined by regexes are evaluated.",
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  0,

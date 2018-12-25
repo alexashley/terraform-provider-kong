@@ -1,6 +1,5 @@
-all=build example testacc
-
-.PHONY=all
+.PHONY: build example testacc clean-docs build-docs docs
+.ONESHELL: build-docs
 MAKEFLAGS += --silent
 
 KONG ?= "http://localhost:8001"
@@ -19,3 +18,14 @@ example: build
 	terraform destroy example
 	terraform apply example
 	terraform plan example
+
+clean-docs:
+	rm -rf docs
+
+build-docs:
+	cd docsgen
+	GO111MODULE=on go build -o docsgen
+
+docs: clean-docs build-docs
+	./docsgen/docsgen
+

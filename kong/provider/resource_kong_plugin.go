@@ -22,20 +22,24 @@ func resourceKongPlugin() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"service_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The service for which the plugin will run.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"route_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The route for which the plugin will run.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"consumer_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The consumer for which the plugin will run. Not supported by all plugins.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The plugin name, e.g. `basic-auth`",
+				Type:        schema.TypeString,
+				Required:    true,
 				ValidateFunc: func(i interface{}, s string) (warnings []string, errors []error) {
 					name := i.(string)
 
@@ -53,12 +57,16 @@ func resourceKongPlugin() *schema.Resource {
 				},
 			},
 			"config": {
+				Description:   "An object representing the plugin's configuration. At this time it's not possible to represent all valid plugin configurations with Terraform. Should this be a problem, you can use a specific plugin resource or the `config_json` field.	",
 				Type:          schema.TypeMap,
-				Elem:          schema.TypeString,
+				Elem:          &schema.Schema{
+					Type: schema.TypeString,
+				},
 				Optional:      true,
 				ConflictsWith: []string{"config_json"},
 			},
 			"config_json": {
+				Description:      "A JSON string containing the plugin's configuration. Can't be used with `config`.",
 				Type:             schema.TypeString,
 				Optional:         true,
 				ConflictsWith:    []string{"config"},
@@ -66,13 +74,15 @@ func resourceKongPlugin() *schema.Resource {
 				DiffSuppressFunc: structure.SuppressJsonDiff,
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Turns the plugin on or off.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 			"created_at": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "Unix timestamp representing the creation date",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 		},
 	}

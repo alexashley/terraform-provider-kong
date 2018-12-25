@@ -1,0 +1,12 @@
+description: |
+  A representation of Kong's [consumer object](https://docs.konghq.com/0.14.x/admin-api/#consumer-object)
+example: |
+  resource "kong_consumer" "crocodile-hunter" {
+    username = "steve-irwin"
+  }
+import: |
+  Existing Kong consumers can also be imported into Terraform state
+  Example:
+   ```bash
+    terraform import kong_consumer.crocodile-hunter <consumer UUID>
+  ```

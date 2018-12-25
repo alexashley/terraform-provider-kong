@@ -1,0 +1,23 @@
+{{ define "base" }}# {{ .Resource.Name }}
+{{ .Meta.Description }}
+### Example usage
+
+```hcl
+{{ .Meta.Example }}
+```
+
+### Fields Reference
+The following fields are supported:
+
+| field     | explanation     | type      | default     | required                         |
+|-----------|-----------------|-----------|-------------|----------------------------------|{{ range .Resource.UserProvidedAttributes}}
+|`{{.Name}}`|{{.Description}} |`{{.Type}}`| {{.Default}}| {{if .Required}}Y{{else}}N{{end}}|{{ end }}
+{{ if.Resource.ComputedAttributes }}### Computed Fields
+The following computed attributes are also available:
+
+| field     | explanation     | type    |
+|-----------|-----------------|---------|{{ range .Resource.ComputedAttributes}}
+|`{{.Name}}`|{{.Description}} |{{.Type}}|{{ end }}{{end}}
+{{ if .Resource.CanImport }}
+### Import
+{{ .Meta.Import }}{{ end }}{{ end }}

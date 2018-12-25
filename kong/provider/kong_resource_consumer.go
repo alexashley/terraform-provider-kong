@@ -17,12 +17,14 @@ func resourceKongConsumer() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"username": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "A unique username representing a consumer of the API.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"custom_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "A unique identifier representing a user or service of your API. It can be used to map to existing users in your database.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}

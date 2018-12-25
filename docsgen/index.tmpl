@@ -1,0 +1,14 @@
+{{ define "index" }}# {{ .Title }}
+
+## Provider
+```hcl
+provider "kong" {
+  admin_api_url = "http://localhost:8001"
+  rbac_token = "foobar"
+}
+```
+
+## Resources
+{{ range $r := .Resources}}
+- [`{{$r}}`](/docs/{{$r}}.md){{end}}
+{{end}}

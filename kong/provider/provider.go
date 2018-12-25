@@ -13,7 +13,6 @@ var resourcesMap = map[string]*schema.Resource{
 }
 
 var pluginResourcesMap = map[string]*schema.Resource{
-	"kong_plugin_ip_header_restriction":        resourceKongPluginIpHeaderRestriction(),
 	"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
 }
 
