@@ -6,17 +6,11 @@ For more information on `regex_priority`, see the [Kong docs](https://docs.kongh
 
 ### Example usage
 
-~~~hcl
+~~~
 resource "kong_route" "mock" {
   service_id  = "${kong_service.mockbin.id}"
   paths       = ["/mock"]
 }
-~~~
-
-~~~js
-const a = async () => Promise.resolve('a');
-
-console.log(await a());
 ~~~
 
 ### Fields Reference

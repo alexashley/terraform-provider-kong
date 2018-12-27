@@ -3,16 +3,10 @@ A representation of Kong's [consumer object](https://docs.konghq.com/0.14.x/admi
 
 ### Example usage
 
-~~~hcl
+~~~
 resource "kong_consumer" "crocodile-hunter" {
   username = "steve-irwin"
 }
-~~~
-
-~~~js
-const a = async () => Promise.resolve('a');
-
-console.log(await a());
 ~~~
 
 ### Fields Reference

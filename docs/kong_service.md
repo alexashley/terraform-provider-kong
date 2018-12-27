@@ -3,17 +3,11 @@ A representation of Kong's [service object](https://docs.konghq.com/0.14.x/admin
 
 ### Example usage
 
-~~~hcl
+~~~
 resource "kong_service" "mockbin" {
   name  = "mockbin"
   url   = "https://mockbin.org/request"
 }
-~~~
-
-~~~js
-const a = async () => Promise.resolve('a');
-
-console.log(await a());
 ~~~
 
 ### Fields Reference
