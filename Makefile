@@ -20,7 +20,7 @@ example: build
 	terraform plan example
 
 clean-docs:
-	rm -rf docs
+	rm -rf docs/*.md
 
 build-docs:
 	cd docsgen
