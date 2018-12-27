@@ -57,14 +57,13 @@ func resourceKongPlugin() *schema.Resource {
 		},
 		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) error {
 			config := plugin.Config
-
 			configJson, err := json.Marshal(config)
 
 			if err != nil {
 				return err
 			}
 
-			data.Set("config_json", configJson)
+			data.Set("config_json", string(configJson[:]))
 			data.Set("name", plugin.Name)
 
 			return nil

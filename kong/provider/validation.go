@@ -2,16 +2,14 @@ package provider
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"net/url"
-	"regexp"
 )
 
-const uuidRegex = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"
+func isValidUuid(input string) bool {
+	_, err := uuid.Parse(input)
 
-func isValidUuid(uuid string) bool {
-	r := regexp.MustCompile(uuidRegex)
-
-	return r.MatchString(uuid)
+	return err == nil
 }
 
 func filterBySet(input interface{}, valid []string) ([]string, error) {

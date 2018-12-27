@@ -112,7 +112,7 @@ func testAccCheckKongConsumerDestroy(name string) resource.TestCheckFunc {
 			consumer, err := client.GetConsumer(state.RootModule().Resources[name].Primary.ID)
 
 			if err == nil {
-				return fmt.Errorf("Consumer still exists: %s", consumer.Id)
+				return fmt.Errorf("consumer still exists: %s", consumer.Id)
 			}
 
 			if resourceDoesNotExistError(err) {
@@ -131,11 +131,11 @@ func testAccCheckKongConsumerExists(name string, output *kong.KongConsumer) reso
 		r, ok := state.RootModule().Resources[name]
 
 		if !ok {
-			return fmt.Errorf("Consumer resource not found %s", name)
+			return fmt.Errorf("consumer resource not found %s", name)
 		}
 
 		if r.Primary.ID == "" {
-			return fmt.Errorf("No id set for %s", name)
+			return fmt.Errorf("no id set for %s", name)
 		}
 
 		client := testAccProvider.Meta().(*kong.KongClient)

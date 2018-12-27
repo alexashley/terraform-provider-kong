@@ -30,6 +30,6 @@ return {
         anonymous = { type = "string" },
         auth_methods = { type = "array", func = allowed_methods },
         issuer = { type = "url", required = true },
-        consumer_claims = { type = "array" }
+        consumer_claim = { type = "array" }
     }
 }

@@ -62,7 +62,7 @@ func resourceKongConsumerRead(data *schema.ResourceData, meta interface{}) error
 			return nil
 		}
 
-		return nil
+		return err
 	}
 
 	data.Set("username", consumer.Username)

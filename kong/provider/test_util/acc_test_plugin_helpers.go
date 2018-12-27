@@ -20,7 +20,7 @@ func TestAccCheckGenericKongPluginDestroy(provider *schema.Provider, resourceTyp
 			plugin, err := kong.GetPlugin(state.RootModule().Resources[resourceName].Primary.ID)
 
 			if err == nil {
-				return fmt.Errorf("Kong plugin %s still exists: %s", pluginName, plugin.Id)
+				return fmt.Errorf("kong plugin %s still exists: %s", pluginName, plugin.Id)
 			}
 
 			if ResourceDoesNotExistError(err) {

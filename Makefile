@@ -1,8 +1,10 @@
-.PHONY: build example testacc clean-docs build-docs docs
+.PHONY: build example testacc clean-docs build-docs docs coverageacc docker-image docker-push
 .ONESHELL: build-docs
 MAKEFLAGS += --silent
 
 KONG ?= "http://localhost:8001"
+
+IMAGE_VERSION="0.0.6"
 
 build:
 	 GO111MODULE=on go build -o terraform-provider-kong
@@ -29,5 +31,14 @@ build-docs:
 docs: clean-docs build-docs
 	./docsgen/docsgen
 
-coverage-report: testacc
+coverageacc: testacc
 	 go tool cover -html=coverage.out
+
+docker-image:
+	docker build \
+	-t alexashley/tf-provider-custom-kong:${IMAGE_VERSION} \
+	--build-arg KONG_CUSTOM_PLUGINS=$$(find kong-docker/plugins/* -type d | sed "s|^\kong-docker/plugins/||" | paste -d, -s) \
+	kong-docker
+
+docker-push:
+	docker push alexashley/tf-provider-custom-kong:${IMAGE_VERSION}

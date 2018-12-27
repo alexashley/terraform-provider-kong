@@ -7,6 +7,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/google/subcommands v0.0.0-20180618214453-5bae204cdfb2
+	github.com/google/uuid v1.1.0
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0 // indirect
 	github.com/hashicorp/go-getter v0.0.0-20180809191950-4bda8fa99001 // indirect

@@ -37,11 +37,16 @@ func testAccPreCheck(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	exitCode := m.Run()
+	threshold := 0.81
 	if exitCode == 0 && testing.CoverMode() != "" {
 		c := testing.Coverage()
-		if c < 0.59 {
-			fmt.Println("Coverage failure: ", c)
+		coveragePercent := c * 100
+		thresholdPercent := threshold * 100
+		if c < threshold {
+			fmt.Printf("coverage failure:  %.2f%% (threshold: %.2f%%)\n", coveragePercent, thresholdPercent)
 			exitCode = -1
+		} else {
+			fmt.Printf("internal coverage: %.2f%% (threshold: %.2f%%)\n", coveragePercent, thresholdPercent)
 		}
 	}
 	os.Exit(exitCode)

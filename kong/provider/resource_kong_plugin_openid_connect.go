@@ -26,6 +26,7 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"consumer_claim": {
 				Description: "JWT claims to use to map to a Kong consumer. Typically set to `sub`",
@@ -34,6 +35,7 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"issuer": {
 				Description:  "URL of the OpenId Connect server",
@@ -45,12 +47,13 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 		MapSchemaToPluginConfig: func(data *schema.ResourceData) (interface{}, error) {
 			config := make(map[string]interface{})
 			config["issuer"] = data.Get("issuer").(string)
-			optionals := []string{"anonymous", "consumer_claim"}
+			if value, ok := data.GetOk("anonymous"); ok {
+				config["anonymous"] = value
+			}
 
-			for _, attribute := range optionals {
-				if value, ok := data.GetOk(attribute); ok {
-					config[attribute] = value
-				}
+			if consumerClaim, ok := data.GetOk("consumer_claim"); ok {
+				claims := setToStringArray(consumerClaim.(*schema.Set))
+				config["consumer_claim"] = claims
 			}
 
 			if authMethods, ok := data.GetOk("auth_methods"); ok {
