@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -152,6 +153,9 @@ resource "kong_route" "invalid-protocol-route" {
 func TestAccKongRoute_validate_methods(t *testing.T) {
 	serviceName := fmt.Sprintf("kong-provider-acc-test-%s", acctest.RandString(5))
 	invalidMethods := []string{acctest.RandString(10), acctest.RandString(5)}
+	sort.Slice(invalidMethods, func(i, j int) bool {
+		return invalidMethods[i] < invalidMethods[j]
+	})
 
 	config := fmt.Sprintf(`
 resource "kong_service" "test" {

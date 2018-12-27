@@ -18,24 +18,24 @@ The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
 |-----------|-----------------|-----------|-------------|----------------------------------|
-|`add_body_params`|Body parameters to add to the request. Ignored if already set. |`[]string`| N/A| N|
-|`add_headers`|Header key:value pairs to add to the request. Ignored if the header is already set. |`[]string`| N/A| N|
-|`add_querystring`|Querystring key:value pairs to add to the request. Ignored if the query is already set. |`[]string`| N/A| N|
-|`append_body_params`|Body parameters to append to the request. The parameter is set if it's not already in the request |`[]string`| N/A| N|
-|`append_headers`|Header key:value pairs to append to the request. The header is added if it's not already present |`[]string`| N/A| N|
-|`append_querystring`|Querystring key:value pairs to append to the request. The query is added if it's not already present |`[]string`| N/A| N|
+|`add_body_params`|Body parameters to add to the request. Ignored if already set. |`set[string]`| N/A| N|
+|`add_headers`|Header key:value pairs to add to the request. Ignored if the header is already set. |`set[string]`| N/A| N|
+|`add_querystring`|Querystring key:value pairs to add to the request. Ignored if the query is already set. |`set[string]`| N/A| N|
+|`append_body_params`|Body parameters to append to the request. The parameter is set if it's not already in the request |`set[string]`| N/A| N|
+|`append_headers`|Header key:value pairs to append to the request. The header is added if it's not already present |`set[string]`| N/A| N|
+|`append_querystring`|Querystring key:value pairs to append to the request. The query is added if it's not already present |`set[string]`| N/A| N|
 |`consumer_id`|Unique identifier of the consumer for which this plugin will run. Not all plugins allow consumers |`string`| N/A| N|
 |`enabled`|Toggle whether the plugin will run |`bool`| true| N|
 |`http_method`|Method that will be used for the upstream request. |`string`| N/A| N|
-|`remove_body_params`|Body parameters to scrub from the request. |`[]string`| N/A| N|
-|`remove_headers`|Header key:value pairs to scrub from the request. |`[]string`| N/A| N|
-|`remove_querystring`|Querystring key:value pairs to scrub from the request. |`[]string`| N/A| N|
-|`rename_body_params`|Body parameters to rename in the request. |`[]string`| N/A| N|
-|`rename_headers`|Header key:value pairs. If the header is set, it will be renamed. The value will remain unchanged. |`[]string`| N/A| N|
-|`rename_querystring`|Querystring key:value pairs. If the querystring is in the request, the field will be renamed but the value will remain the same. |`[]string`| N/A| N|
-|`replace_body_params`|Body parameters to replace in the request. If the param is set, its value will be replaced. Otherwise it will be ignored. |`[]string`| N/A| N|
-|`replace_headers`|Header key:value pairs. If the header is set, its value will be replaced. Otherwise it will be ignored |`[]string`| N/A| N|
-|`replace_querystring`|Querystring key:value pairs to replace if the key is set in the request. |`[]string`| N/A| N|
+|`remove_body_params`|Body parameters to scrub from the request. |`set[string]`| N/A| N|
+|`remove_headers`|Header key:value pairs to scrub from the request. |`set[string]`| N/A| N|
+|`remove_querystring`|Querystring key:value pairs to scrub from the request. |`set[string]`| N/A| N|
+|`rename_body_params`|Body parameters to rename in the request. |`set[string]`| N/A| N|
+|`rename_headers`|Header key:value pairs. If the header is set, it will be renamed. The value will remain unchanged. |`set[string]`| N/A| N|
+|`rename_querystring`|Querystring key:value pairs. If the querystring is in the request, the field will be renamed but the value will remain the same. |`set[string]`| N/A| N|
+|`replace_body_params`|Body parameters to replace in the request. If the param is set, its value will be replaced. Otherwise it will be ignored. |`set[string]`| N/A| N|
+|`replace_headers`|Header key:value pairs. If the header is set, its value will be replaced. Otherwise it will be ignored |`set[string]`| N/A| N|
+|`replace_querystring`|Querystring key:value pairs to replace if the key is set in the request. |`set[string]`| N/A| N|
 |`replace_uri`|Rewrites the path to the upstream request. |`string`| N/A| N|
 |`route_id`|Unique identifier of the associated route. |`string`| N/A| N|
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| N|

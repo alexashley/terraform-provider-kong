@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/kong"
 	"github.com/hashicorp/terraform/helper/schema"
+	"sort"
 	"strings"
 )
 
@@ -198,6 +199,10 @@ func validateRouteResource(data *schema.ResourceData) error {
 	invalidProtocols, _ := filterBySet(protocols, supportedProtocols)
 
 	if len(invalidProtocols) > 0 {
+		sort.Slice(invalidProtocols, func(i, j int) bool {
+			return invalidProtocols[i] < invalidProtocols[j]
+		})
+
 		return fmt.Errorf("the supplied protocols are not supported by Kong: %s", strings.Join(invalidProtocols, ", "))
 	}
 	methods := data.Get("methods").(*schema.Set).List()
@@ -205,6 +210,10 @@ func validateRouteResource(data *schema.ResourceData) error {
 	invalidMethods, _ := filterBySet(methods, supportedMethods)
 
 	if len(invalidMethods) > 0 {
+		sort.Slice(invalidMethods, func(i, j int) bool {
+			return invalidMethods[i] < invalidMethods[j]
+		})
+
 		return fmt.Errorf("invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))
 	}
 
