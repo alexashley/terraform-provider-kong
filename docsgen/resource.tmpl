@@ -10,7 +10,7 @@
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|{{ range .Resource.UserProvidedAttributes}}
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |{{ range .Resource.UserProvidedAttributes}}
 |`{{.Name}}`|{{.Description}} |`{{.Type}}`| {{.Default}}| {{if .Required}}Y{{else}}N{{end}}|{{ end }}
 {{ if.Resource.ComputedAttributes }}### Computed Fields
 The following computed attributes are also available:

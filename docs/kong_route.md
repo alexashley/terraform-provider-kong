@@ -18,7 +18,7 @@ resource "kong_route" "mock" {
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| Y|
 |`hosts`|Host header values that should be matched to this route. |`set[string]`| N/A| N|
 |`methods`|HTTP verbs that Kong will proxy to this route |`set[string]`| N/A| N|

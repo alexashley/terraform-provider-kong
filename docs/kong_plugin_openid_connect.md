@@ -17,7 +17,7 @@ resource "kong_plugin_openid_connect" "oidc-route" {
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`issuer`|URL of the OpenId Connect server |`string`| N/A| Y|
 |`anonymous`|Anonymous consumer id. This is useful if you need to enable multiple auth plugins -- failing to authenticate will cause this consumer to be set. |`string`| N/A| N|
 |`auth_methods`|Allowed authentication methods |`set[string]`| N/A| N|

@@ -27,7 +27,7 @@ resource "kong_plugin" "basic-auth-plugin" {
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`config_json`|A JSON string containing the plugin's configuration. |`string`| N/A| Y|
 |`name`|The plugin name, e.g. `basic-auth` |`string`| N/A| Y|
 |`consumer_id`|Unique identifier of the consumer for which this plugin will run. Not all plugins allow consumers |`string`| N/A| N|

@@ -15,7 +15,7 @@ resource "kong_service" "mockbin" {
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`name`|The service name. |`string`| N/A| Y|
 |`url`|The url for the service. It encapsulates protocol, host, port and path |`string`| N/A| Y|
 |`connect_timeout`|Time in milliseconds to connect to the upstream server. |`int`| 60000| N|

@@ -17,7 +17,7 @@ resource  "kong_plugin_request_transformer_advanced" "request-transformer-plugin
 The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
-|-----------|-----------------|-----------|-------------|----------------------------------|
+| :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`add_body_params`|Body parameters to add to the request. Ignored if already set. |`set[string]`| N/A| N|
 |`add_headers`|Header key:value pairs to add to the request. Ignored if the header is already set. |`set[string]`| N/A| N|
 |`add_querystring`|Querystring key:value pairs to add to the request. Ignored if the query is already set. |`set[string]`| N/A| N|
