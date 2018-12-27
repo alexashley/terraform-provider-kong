@@ -1,5 +1,2 @@
-commonmark:
-  extensions:
-  - autolink
-  - table
-markdown: CommonMarkGhPages
+markdown: kramdown
+highlighter: rouge
