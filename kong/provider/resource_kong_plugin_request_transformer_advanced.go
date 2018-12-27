@@ -48,43 +48,51 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 			},
 			"remove_headers": {
 				Description: "Header key:value pairs to scrub from the request.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				// The hash function needs to be specified -- the default is to hash the entire schema
+				// This is technically fine, but we don't really care about the schema, but rather the value
+				// https://github.com/hashicorp/terraform/blob/c753df6a933ef25197101664b1d7cbb5d115701d/helper/schema/schema.go#L290
+				Set: schema.HashString,
 			},
 			"remove_querystring": {
 				Description: "Querystring key:value pairs to scrub from the request.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"remove_body_params": {
 				Description: "Body parameters to scrub from the request.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"replace_headers": {
 				Description: "Header key:value pairs. If the header is set, its value will be replaced. Otherwise it will be ignored",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"replace_querystring": {
 				Description: "Querystring key:value pairs to replace if the key is set in the request.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"replace_uri": {
 				Description: "Rewrites the path to the upstream request.",
@@ -93,83 +101,93 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 			},
 			"replace_body_params": {
 				Description: "Body parameters to replace in the request. If the param is set, its value will be replaced. Otherwise it will be ignored.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"rename_headers": {
 				Description: "Header key:value pairs. If the header is set, it will be renamed. The value will remain unchanged.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"rename_querystring": {
 				Description: "Querystring key:value pairs. If the querystring is in the request, the field will be renamed but the value will remain the same.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"rename_body_params": {
 				Description: "Body parameters to rename in the request.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"add_headers": {
 				Description: "Header key:value pairs to add to the request. Ignored if the header is already set.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"add_querystring": {
 				Description: "Querystring key:value pairs to add to the request. Ignored if the query is already set.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"add_body_params": {
 				Description: "Body parameters to add to the request. Ignored if already set.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"append_headers": {
 				Description: "Header key:value pairs to append to the request. The header is added if it's not already present",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"append_querystring": {
 				Description: "Querystring key:value pairs to append to the request. The query is added if it's not already present",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 			"append_body_params": {
 				Description: "Body parameters to append to the request. The parameter is set if it's not already in the request",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Set: schema.HashString,
 			},
 		},
 		MapSchemaToPluginConfig: func(data *schema.ResourceData) (interface{}, error) {
@@ -249,5 +267,7 @@ func getStringArray(data *schema.ResourceData, keyName string) []string {
 		return []string{}
 	}
 
-	return toStringArrayFromInterface(value)
+	set := value.(*schema.Set)
+
+	return toStringArrayFromInterface(set.List())
 }

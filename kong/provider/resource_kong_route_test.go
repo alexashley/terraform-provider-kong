@@ -33,14 +33,14 @@ func TestAccKongRoute_basic(t *testing.T) {
 						Methods:   []string{"GET", "PUT", "DELETE"},
 					}),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "protocols.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "protocols.0", "http"),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "protocols", "http"),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "methods.#", "3"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "methods.0", "GET"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "methods.1", "PUT"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "methods.2", "DELETE"),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "methods", "GET"),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "methods", "PUT"),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "methods", "DELETE"),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "hosts.#", "0"),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.0", routePath),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "paths", routePath),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "strip_path", "true"),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "preserve_host", "false"),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "regex_priority", "0"),
@@ -66,7 +66,7 @@ func TestAccKongRoute_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongRouteExists("kong_route.basic-route", &route),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.0", routePath),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "paths", routePath),
 				),
 			},
 			{
@@ -74,7 +74,7 @@ func TestAccKongRoute_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongRouteExists("kong_route.basic-route", &route),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.0", updatedRoutePath),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "paths", updatedRoutePath),
 				),
 			},
 			{
@@ -82,7 +82,7 @@ func TestAccKongRoute_update(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckKongRouteExists("kong_route.basic-route", &route),
 					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.basic-route", "paths.0", routePath),
+					test_util.AssertValueInTerraformSet("kong_route.basic-route", "paths", routePath),
 				),
 			},
 		},
@@ -109,11 +109,11 @@ func TestAccKongRoute_host(t *testing.T) {
 						Protocols: []string{"http", "https"},
 					}),
 					resource.TestCheckResourceAttr("kong_route.host-route", "protocols.#", "2"),
-					resource.TestCheckResourceAttr("kong_route.host-route", "protocols.0", "http"),
-					resource.TestCheckResourceAttr("kong_route.host-route", "protocols.1", "https"),
+					test_util.AssertValueInTerraformSet("kong_route.host-route", "protocols", "http"),
+					test_util.AssertValueInTerraformSet("kong_route.host-route", "protocols", "https"),
 					resource.TestCheckResourceAttr("kong_route.host-route", "methods.#", "0"),
 					resource.TestCheckResourceAttr("kong_route.host-route", "hosts.#", "1"),
-					resource.TestCheckResourceAttr("kong_route.host-route", "hosts.0", host),
+					test_util.AssertValueInTerraformSet("kong_route.host-route", "hosts", host),
 					resource.TestCheckResourceAttr("kong_route.host-route", "paths.#", "0"),
 				),
 			},
@@ -208,11 +208,11 @@ func testAccCheckKongRouteExists(name string, output *kong.KongRoute) resource.T
 		r, ok := state.RootModule().Resources[name]
 
 		if !ok {
-			return fmt.Errorf("Route resource not found: %s", name)
+			return fmt.Errorf("route resource not found: %s", name)
 		}
 
 		if r.Primary.ID == "" {
-			return fmt.Errorf("No id set for %s", name)
+			return fmt.Errorf("no id set for %s", name)
 		}
 
 		client := testAccProvider.Meta().(*kong.KongClient)
@@ -240,7 +240,7 @@ func testAccCheckKongRouteDestroy(name string) resource.TestCheckFunc {
 			route, err := client.GetRoute(state.RootModule().Resources[name].Primary.ID)
 
 			if err == nil {
-				return fmt.Errorf("Route still exists: %s", route.Id)
+				return fmt.Errorf("route still exists: %s", route.Id)
 			}
 
 			kongError, ok := err.(*kong.HttpError)
@@ -263,19 +263,19 @@ func testAccCheckKongRouteDestroy(name string) resource.TestCheckFunc {
 func testAccCheckKongRouteAttributes(actualRoute *kong.KongRoute, expectedRoute *kong.KongRoute) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		if !slicesAreEqual(actualRoute.Protocols, expectedRoute.Protocols) {
+		if !setsAreEqual(actualRoute.Protocols, expectedRoute.Protocols) {
 			return test_util.ExpectedAndActualErrorStringSlice("Protocols don't match", expectedRoute.Protocols, actualRoute.Protocols)
 		}
 
-		if !slicesAreEqual(actualRoute.Methods, expectedRoute.Methods) {
+		if !setsAreEqual(actualRoute.Methods, expectedRoute.Methods) {
 			return test_util.ExpectedAndActualErrorStringSlice("Methods don't match", expectedRoute.Methods, actualRoute.Methods)
 		}
 
-		if !slicesAreEqual(actualRoute.Hosts, expectedRoute.Hosts) {
+		if !setsAreEqual(actualRoute.Hosts, expectedRoute.Hosts) {
 			return test_util.ExpectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Hosts, actualRoute.Hosts)
 		}
 
-		if !slicesAreEqual(actualRoute.Paths, expectedRoute.Paths) {
+		if !setsAreEqual(actualRoute.Paths, expectedRoute.Paths) {
 			return test_util.ExpectedAndActualErrorStringSlice("Paths don't match", expectedRoute.Paths, actualRoute.Paths)
 		}
 
@@ -312,13 +312,21 @@ resource "kong_route" "host-route" {
 }`, serviceName, host)
 }
 
-func slicesAreEqual(a []string, b []string) bool {
+func setsAreEqual(a []string, b []string) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	for i := range a {
-		if a[i] != b[i] {
+		match := false
+		for j := range b {
+			if a[i] == b[j] {
+				match = true
+				break
+			}
+		}
+
+		if !match {
 			return false
 		}
 	}

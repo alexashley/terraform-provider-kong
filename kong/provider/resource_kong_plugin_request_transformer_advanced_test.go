@@ -176,17 +176,6 @@ func TestAccKongPluginRequestTransformerAdvanced_all(t *testing.T) {
 	expectedAddCrud := randomRequestTransformerCrud("add", false)
 	expectedAppendCrud := randomRequestTransformerCrud("append", false)
 
-	//conf := testAccKongPluginRequestTransformerAdvancedConfig_complex(
-	//	expectedMethod,
-	//	expectedRemoveCrud,
-	//	expectedReplaceCrud,
-	//	expectedRenameCrud,
-	//	expectedAppendCrud,
-	//	expectedAddCrud,
-	//)
-	//
-	//util.Log(conf)
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -250,39 +239,39 @@ func TestAccKongPluginRequestTransformerAdvanced_all(t *testing.T) {
 					// replace
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_uri", expectedReplaceCrud.uri),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_body_params.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_body_params.0", expectedReplaceCrud.body[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "replace_body_params", expectedReplaceCrud.body[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_headers.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_headers.0", expectedReplaceCrud.headers[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "replace_headers", expectedReplaceCrud.headers[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_querystring.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "replace_querystring.0", expectedReplaceCrud.querystring[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "replace_querystring", expectedReplaceCrud.querystring[0]),
 					// remove
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_body_params.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_body_params.0", expectedRemoveCrud.body[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "remove_body_params", expectedRemoveCrud.body[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_headers.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_headers.0", expectedRemoveCrud.headers[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "remove_headers", expectedRemoveCrud.headers[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_querystring.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "remove_querystring.0", expectedRemoveCrud.querystring[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "remove_querystring", expectedRemoveCrud.querystring[0]),
 					// rename
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_body_params.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_body_params.0", expectedRenameCrud.body[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "rename_body_params", expectedRenameCrud.body[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_headers.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_headers.0", expectedRenameCrud.headers[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "rename_headers", expectedRenameCrud.headers[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_querystring.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "rename_querystring.0", expectedRenameCrud.querystring[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "rename_querystring", expectedRenameCrud.querystring[0]),
 					// add
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_body_params.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_body_params.0", expectedAddCrud.body[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "add_body_params", expectedAddCrud.body[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_headers.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_headers.0", expectedAddCrud.headers[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "add_headers", expectedAddCrud.headers[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_querystring.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "add_querystring.0", expectedAddCrud.querystring[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "add_querystring", expectedAddCrud.querystring[0]),
 					// append
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_body_params.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_body_params.0", expectedAppendCrud.body[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "append_body_params", expectedAppendCrud.body[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_headers.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_headers.0", expectedAppendCrud.headers[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "append_headers", expectedAppendCrud.headers[0]),
 					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_querystring.#", "1"),
-					resource.TestCheckResourceAttr("kong_plugin_request_transformer_advanced.test", "append_querystring.0", expectedAppendCrud.querystring[0]),
+					test_util.AssertValueInTerraformSet("kong_plugin_request_transformer_advanced.test", "append_querystring", expectedAppendCrud.querystring[0]),
 				),
 			},
 		},

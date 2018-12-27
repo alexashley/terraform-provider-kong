@@ -32,7 +32,7 @@ func resourceKongRoute() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"protocols": {
 				Description: "Protocols that Kong will proxy to this route",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -41,30 +41,34 @@ func resourceKongRoute() *schema.Resource {
 				},
 				Optional: true,
 				Computed: true,
+				Set:      schema.HashString,
 			},
 			"methods": {
 				Description: "HTTP verbs that Kong will proxy to this route",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
+				Set:      schema.HashString,
 			},
 			"hosts": {
 				Description: "Host header values that should be matched to this route.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
+				Set:      schema.HashString,
 			},
 			"paths": {
 				Description: "List of path prefixes that will match this route",
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 				Optional: true,
+				Set:      schema.HashString,
 			},
 			"strip_path": {
 				Description: " If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request.",
@@ -177,10 +181,10 @@ func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error 
 func mapToApiRoute(data *schema.ResourceData) *kong.KongRoute {
 	return &kong.KongRoute{
 		Id:           data.Id(),
-		Methods:      toStringArray(data.Get("methods").([]interface{})),
-		Protocols:    toStringArray(data.Get("protocols").([]interface{})),
-		Hosts:        toStringArray(data.Get("hosts").([]interface{})),
-		Paths:        toStringArray(data.Get("paths").([]interface{})),
+		Methods:      toStringArray(data.Get("methods").(*schema.Set).List()),
+		Protocols:    toStringArray(data.Get("protocols").(*schema.Set).List()),
+		Hosts:        toStringArray(data.Get("hosts").(*schema.Set).List()),
+		Paths:        toStringArray(data.Get("paths").(*schema.Set).List()),
 		StripPath:    data.Get("strip_path").(bool),
 		PreserveHost: data.Get("preserve_host").(bool),
 		Service: kong.KongServiceReference{
@@ -190,13 +194,13 @@ func mapToApiRoute(data *schema.ResourceData) *kong.KongRoute {
 }
 
 func validateRouteResource(data *schema.ResourceData) error {
-	protocols := data.Get("protocols")
+	protocols := data.Get("protocols").(*schema.Set).List()
 	invalidProtocols, _ := filterBySet(protocols, supportedProtocols)
 
 	if len(invalidProtocols) > 0 {
 		return fmt.Errorf("the supplied protocols are not supported by Kong: %s", strings.Join(invalidProtocols, ", "))
 	}
-	methods := data.Get("methods").([]interface{})
+	methods := data.Get("methods").(*schema.Set).List()
 
 	invalidMethods, _ := filterBySet(methods, supportedMethods)
 
@@ -204,8 +208,8 @@ func validateRouteResource(data *schema.ResourceData) error {
 		return fmt.Errorf("invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))
 	}
 
-	paths := data.Get("paths").([]interface{})
-	hosts := data.Get("hosts").([]interface{})
+	paths := data.Get("paths").(*schema.Set).List()
+	hosts := data.Get("hosts").(*schema.Set).List()
 
 	if len(paths) == 0 && len(hosts) == 0 && len(methods) == 0 {
 		return fmt.Errorf("at least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route")
