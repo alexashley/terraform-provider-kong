@@ -16,6 +16,7 @@ resource  "kong_plugin_request_transformer_advanced" "request-transformer-plugin
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`add_body_params`|Body parameters to add to the request. Ignored if already set. |`set[string]`| N/A| N|
@@ -39,6 +40,8 @@ The following fields are supported:
 |`replace_uri`|Rewrites the path to the upstream request. |`string`| N/A| N|
 |`route_id`|Unique identifier of the associated route. |`string`| N/A| N|
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| N|
+
+
 ### Computed Fields
 The following computed attributes are also available:
 

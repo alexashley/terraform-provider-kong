@@ -17,6 +17,7 @@ resource "kong_route" "mock" {
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| Y|
@@ -27,6 +28,8 @@ The following fields are supported:
 |`protocols`|Protocols that Kong will proxy to this route |`set[string]`| N/A| N|
 |`regex_priority`|Determines the order that paths defined by regexes are evaluated. |`int`| 0| N|
 |`strip_path`| If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request. |`bool`| true| N|
+
+
 ### Computed Fields
 The following computed attributes are also available:
 

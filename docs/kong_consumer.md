@@ -13,10 +13,13 @@ resource "kong_consumer" "crocodile-hunter" {
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`custom_id`|A unique identifier representing a user or service of your API. It can be used to map to existing users in your database. |`string`| N/A| N|
 |`username`|A unique username representing a consumer of the API. |`string`| N/A| N|
+
+
 
 
 ### Import

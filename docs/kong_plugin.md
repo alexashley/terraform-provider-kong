@@ -26,6 +26,7 @@ resource "kong_plugin" "basic-auth-plugin" {
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`config_json`|A JSON string containing the plugin's configuration. |`string`| N/A| Y|
@@ -34,6 +35,8 @@ The following fields are supported:
 |`enabled`|Toggle whether the plugin will run |`bool`| true| N|
 |`route_id`|Unique identifier of the associated route. |`string`| N/A| N|
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| N|
+
+
 ### Computed Fields
 The following computed attributes are also available:
 

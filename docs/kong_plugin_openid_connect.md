@@ -16,6 +16,7 @@ resource "kong_plugin_openid_connect" "oidc-route" {
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`issuer`|URL of the OpenId Connect server |`string`| N/A| Y|
@@ -25,6 +26,8 @@ The following fields are supported:
 |`enabled`|Toggle whether the plugin will run |`bool`| true| N|
 |`route_id`|Unique identifier of the associated route. |`string`| N/A| N|
 |`service_id`|Unique identifier of the associated service. |`string`| N/A| N|
+
+
 ### Computed Fields
 The following computed attributes are also available:
 

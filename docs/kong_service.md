@@ -14,6 +14,7 @@ resource "kong_service" "mockbin" {
 ### Fields Reference
 The following fields are supported:
 
+
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
 |`name`|The service name. |`string`| N/A| Y|
@@ -22,6 +23,8 @@ The following fields are supported:
 |`read_timeout`|Time in milliseconds between two read operations to the upstream server. |`int`| 60000| N|
 |`retries`|Number of times Kong will try to proxy if there's an error. |`int`| 5| N|
 |`write_timeout`|Time in milliseconds between two successive write operations to the upstream server. |`int`| 60000| N|
+
+
 ### Computed Fields
 The following computed attributes are also available:
 
