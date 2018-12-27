@@ -1,1 +1,5 @@
+commonmark:
+  extensions:
+  - autolink
+  - table
 markdown: CommonMarkGhPages
