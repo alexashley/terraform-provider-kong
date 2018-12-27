@@ -1,7 +1,7 @@
 # `terraform-provider-kong`
 
 ## Provider
-~~~hcl
+~~~
 provider "kong" {
   admin_api_url = "http://localhost:8001"
   rbac_token    = "foobar"
