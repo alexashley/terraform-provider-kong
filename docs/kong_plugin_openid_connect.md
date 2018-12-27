@@ -4,13 +4,13 @@ Due to the complexity of the plugin, only a subset of the functionality is curre
 
 ### Example usage
 
-~~~
+```hcl
 resource "kong_plugin_openid_connect" "oidc-route" {
   route_id      = "${kong_route.mock.id}"
   auth_methods  = ["bearer"]
   issuer        = "https://oidc.example.com/auth/"
 }
-~~~
+```
 
 ### Fields Reference
 The following fields are supported:

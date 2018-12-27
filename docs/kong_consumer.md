@@ -3,11 +3,11 @@ A representation of Kong's [consumer object](https://docs.konghq.com/0.14.x/admi
 
 ### Example usage
 
-~~~
+```hcl
 resource "kong_consumer" "crocodile-hunter" {
   username = "steve-irwin"
 }
-~~~
+```
 
 ### Fields Reference
 The following fields are supported:

@@ -6,12 +6,12 @@ For more information on `regex_priority`, see the [Kong docs](https://docs.kongh
 
 ### Example usage
 
-~~~
+```hcl
 resource "kong_route" "mock" {
   service_id  = "${kong_service.mockbin.id}"
   paths       = ["/mock"]
 }
-~~~
+```
 
 ### Fields Reference
 The following fields are supported:

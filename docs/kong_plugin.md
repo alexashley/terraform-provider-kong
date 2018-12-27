@@ -9,7 +9,7 @@ Note that if you use the `config_json` field you'll need to provide the full plu
 
 ### Example usage
 
-~~~
+```hcl
 resource "kong_plugin" "basic-auth-plugin" {
   route_id      = "${kong_route.foo-route.id}"
   name          = "basic-auth"
@@ -20,7 +20,7 @@ resource "kong_plugin" "basic-auth-plugin" {
   }
   EOF
 }
-~~~
+```
 
 ### Fields Reference
 The following fields are supported:
