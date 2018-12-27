@@ -28,19 +28,18 @@ The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
 |-----------|-----------------|-----------|-------------|----------------------------------|
+|`config_json`|A JSON string containing the plugin's configuration. |`string`| N/A| Y|
 |`name`|The plugin name, e.g. `basic-auth` |`string`| N/A| Y|
-|`config`|An object representing the plugin's configuration. At this time it's not possible to represent all valid plugin configurations with Terraform. Should this be a problem, you can use a specific plugin resource or the `config_json` field.	 |`map[string][string]`| N/A| N|
-|`config_json`|A JSON string containing the plugin's configuration. Can't be used with `config`. |`string`| N/A| N|
-|`consumer_id`|The consumer for which the plugin will run. Not supported by all plugins. |`string`| N/A| N|
-|`enabled`|Turns the plugin on or off. |`bool`| true| N|
-|`route_id`|The route for which the plugin will run. |`string`| N/A| N|
-|`service_id`|The service for which the plugin will run. |`string`| N/A| N|
+|`consumer_id`|Unique identifier of the consumer for which this plugin will run. Not all plugins allow consumers |`string`| N/A| N|
+|`enabled`|Toggle whether the plugin will run |`bool`| true| N|
+|`route_id`|Unique identifier of the associated route. |`string`| N/A| N|
+|`service_id`|Unique identifier of the associated service. |`string`| N/A| N|
 ### Computed Fields
 The following computed attributes are also available:
 
 | field     | explanation     | type    |
 |-----------|-----------------|---------|
-|`created_at`|Unix timestamp representing the creation date |int|
+|`created_at`|Unix timestamp representing when the plugin was created. |int|
 
 ### Import
 Existing plugins can be imported: `terraform import kong_plugin.basic-auth-plugin <plugin UUID>`

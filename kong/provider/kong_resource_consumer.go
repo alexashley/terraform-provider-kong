@@ -85,7 +85,13 @@ func resourceKongConsumerUpdate(data *schema.ResourceData, meta interface{}) err
 func resourceKongConsumerDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	return kongClient.DeleteConsumer(data.Id())
+	err := kongClient.DeleteConsumer(data.Id())
+
+	if resourceDoesNotExistError(err) {
+		return nil
+	}
+
+	return err
 }
 
 func mapToApiCustomer(data *schema.ResourceData) *kong.KongConsumer {

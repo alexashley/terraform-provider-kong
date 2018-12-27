@@ -25,12 +25,15 @@ type RequestTransformerConfig struct {
 
 func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 	return CreateGenericPluginResource(&GenericPluginResource{
-		Name: "request-transformer-advanced",
+		AllowsConsumers: true,
+		Name: func(data *schema.ResourceData) string {
+			return "request-transformer-advanced"
+		},
 		AdditionalSchema: map[string]*schema.Schema{
 			"http_method": {
 				Description: "Method that will be used for the upstream request.",
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 				ValidateFunc: validation.StringInSlice([]string{
 					"GET",
 					"PUT",
@@ -45,131 +48,131 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 			},
 			"remove_headers": {
 				Description: "Header key:value pairs to scrub from the request.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"remove_querystring": {
 				Description: "Querystring key:value pairs to scrub from the request.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"remove_body_params": {
 				Description: "Body parameters to scrub from the request.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"replace_headers": {
 				Description: "Header key:value pairs. If the header is set, its value will be replaced. Otherwise it will be ignored",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"replace_querystring": {
 				Description: "Querystring key:value pairs to replace if the key is set in the request.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"replace_uri": {
 				Description: "Rewrites the path to the upstream request.",
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"replace_body_params": {
 				Description: "Body parameters to replace in the request. If the param is set, its value will be replaced. Otherwise it will be ignored.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"rename_headers": {
 				Description: "Header key:value pairs. If the header is set, it will be renamed. The value will remain unchanged.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"rename_querystring": {
 				Description: "Querystring key:value pairs. If the querystring is in the request, the field will be renamed but the value will remain the same.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"rename_body_params": {
 				Description: "Body parameters to rename in the request.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"add_headers": {
 				Description: "Header key:value pairs to add to the request. Ignored if the header is already set.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"add_querystring": {
 				Description: "Querystring key:value pairs to add to the request. Ignored if the query is already set.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"add_body_params": {
 				Description: "Body parameters to add to the request. Ignored if already set.",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"append_headers": {
 				Description: "Header key:value pairs to append to the request. The header is added if it's not already present",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"append_querystring": {
 				Description: "Querystring key:value pairs to append to the request. The query is added if it's not already present",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 			"append_body_params": {
 				Description: "Body parameters to append to the request. The parameter is set if it's not already in the request",
-				Type:     schema.TypeList,
-				Optional: true,
+				Type:        schema.TypeList,
+				Optional:    true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
 			},
 		},
-		MapSchemaToPluginConfig: func(data *schema.ResourceData) interface{} {
+		MapSchemaToPluginConfig: func(data *schema.ResourceData) (interface{}, error) {
 			return RequestTransformerConfig{
 				HttpMethod: data.Get("http_method").(string),
 				Remove: RequestTransformerCrud{
@@ -198,9 +201,9 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 					Querystring: getStringArray(data, "append_querystring"),
 					Body:        getStringArray(data, "append_body_params"),
 				},
-			}
+			}, nil
 		},
-		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) {
+		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) error {
 			pluginConfig := plugin.Config.(map[string]interface{})
 
 			httpMethod, ok := data.GetOk("http_method")
@@ -233,6 +236,8 @@ func resourceKongPluginRequestTransformerAdvanced() *schema.Resource {
 					}
 				}
 			}
+
+			return nil
 		},
 	})
 }

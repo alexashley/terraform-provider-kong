@@ -12,8 +12,11 @@ var resourcesMap = map[string]*schema.Resource{
 	"kong_consumer": resourceKongConsumer(),
 }
 
+// these are separate from the other resources, since `kong_plugin` needs a way to determine if a specific resource implementation of a plugin exists.
+// if it does, `kong_plugin` will error and force the use of the specialized resource
 var pluginResourcesMap = map[string]*schema.Resource{
 	"kong_plugin_request_transformer_advanced": resourceKongPluginRequestTransformerAdvanced(),
+	"kong_plugin_openid_connect":               resourceKongPluginOpenidConnect(),
 }
 
 func KongProvider() *schema.Provider {

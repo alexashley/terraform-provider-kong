@@ -2,7 +2,7 @@
 
 set -eu
 
-export KONG_CUSTOM_PLUGINS=request-transformer-advanced
+export KONG_CUSTOM_PLUGINS=request-transformer-advanced,openid-connect
 
 until PGPASSWORD=${KONG_PG_PASSWORD} psql -h "${KONG_PG_HOST}" -U "kong" -c '\q'; do
     >&2 echo "Waiting for postgres to be ready"

@@ -143,7 +143,7 @@ resource "kong_route" "invalid-protocol-route" {
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile("The supplied protocols are not supported by Kong: " + invalidProtocol),
+				ExpectError: regexp.MustCompile("the supplied protocols are not supported by Kong: " + invalidProtocol),
 			},
 		},
 	})
@@ -172,7 +172,7 @@ resource "kong_route" "invalid-methods-route" {
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile(fmt.Sprintf("Invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))),
+				ExpectError: regexp.MustCompile(fmt.Sprintf("invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))),
 			},
 		},
 	})
@@ -197,7 +197,7 @@ resource "kong_route" "invalid-route" {
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile("At least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route."),
+				ExpectError: regexp.MustCompile("at least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route"),
 			},
 		},
 	})

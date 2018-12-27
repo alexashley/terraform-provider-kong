@@ -24,6 +24,7 @@ func resourceKongService() *schema.Resource {
 				Description: "The url for the service. It encapsulates protocol, host, port and path",
 				Type:        schema.TypeString,
 				Required:    true,
+				ValidateFunc: validateUrl,
 			},
 			"created_at": {
 				Description: "Unix timestamp representing the time the service was created.",
@@ -122,7 +123,12 @@ func resourceKongServiceUpdate(data *schema.ResourceData, meta interface{}) erro
 func resourceKongServiceDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	return kongClient.DeleteService(data.Id())
+	err := kongClient.DeleteService(data.Id())
+	if resourceDoesNotExistError(err) {
+		return nil
+	}
+
+	return err
 }
 
 func mapToApiClient(data *schema.ResourceData) kong.KongService {

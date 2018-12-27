@@ -12,29 +12,18 @@ import (
 )
 
 func resourceKongPlugin() *schema.Resource {
-	return &schema.Resource{
-		Create: resourceKongPluginCreate,
-		Read:   resourceKongPluginRead,
-		Update: resourceKongPluginUpdate,
-		Delete: resourceKongPluginDelete,
-		Importer: &schema.ResourceImporter{
-			State: importResourceIfUuidIsValid, // TODO: change import to always import config_json over config
+	return CreateGenericPluginResource(&GenericPluginResource{
+		AllowsConsumers: true,
+		Name: func(data *schema.ResourceData) string {
+			return data.Get("name").(string)
 		},
-		Schema: map[string]*schema.Schema{
-			"service_id": {
-				Description: "The service for which the plugin will run.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"route_id": {
-				Description: "The route for which the plugin will run.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"consumer_id": {
-				Description: "The consumer for which the plugin will run. Not supported by all plugins.",
-				Type:        schema.TypeString,
-				Optional:    true,
+		AdditionalSchema: map[string]*schema.Schema{
+			"config_json": {
+				Description:      "A JSON string containing the plugin's configuration.",
+				Type:             schema.TypeString,
+				Required:         true,
+				ValidateFunc:     validation.ValidateJsonString,
+				DiffSuppressFunc: structure.SuppressJsonDiff,
 			},
 			"name": {
 				Description: "The plugin name, e.g. `basic-auth`",
@@ -48,7 +37,7 @@ func resourceKongPlugin() *schema.Resource {
 					escapeHatchEnvName := "TF_KONG_ALLOW_GENERIC_PLUGIN_" + strings.ToUpper(strings.Replace(name, "-", "_", -1))
 
 					if ok && os.Getenv(escapeHatchEnvName) == "" {
-						errorMessage := fmt.Errorf("Plugin %s has a resource implementation: %s. This resource should be used instead.", name, pluginResourceName)
+						errorMessage := fmt.Errorf("plugin %s has a resource implementation: %s. this resource should be used instead", name, pluginResourceName)
 
 						errors = append(errors, errorMessage)
 					}
@@ -56,133 +45,31 @@ func resourceKongPlugin() *schema.Resource {
 					return warnings, errors
 				},
 			},
-			"config": {
-				Description:   "An object representing the plugin's configuration. At this time it's not possible to represent all valid plugin configurations with Terraform. Should this be a problem, you can use a specific plugin resource or the `config_json` field.	",
-				Type:          schema.TypeMap,
-				Elem:          &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional:      true,
-				ConflictsWith: []string{"config_json"},
-			},
-			"config_json": {
-				Description:      "A JSON string containing the plugin's configuration. Can't be used with `config`.",
-				Type:             schema.TypeString,
-				Optional:         true,
-				ConflictsWith:    []string{"config"},
-				ValidateFunc:     validation.ValidateJsonString,
-				DiffSuppressFunc: structure.SuppressJsonDiff,
-			},
-			"enabled": {
-				Description: "Turns the plugin on or off.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     true,
-			},
-			"created_at": {
-				Description: "Unix timestamp representing the creation date",
-				Type:        schema.TypeInt,
-				Computed:    true,
-			},
 		},
-	}
-}
+		MapSchemaToPluginConfig: func(data *schema.ResourceData) (interface{}, error) {
+			configJson := data.Get("config_json").(string)
+			var config map[string]interface{}
+			if err := json.Unmarshal([]byte(configJson), &config); err != nil {
+				return nil, err
+			}
 
-func resourceKongPluginCreate(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*kong.KongClient)
+			return config, nil
+		},
+		MapApiModelToResource: func(plugin *kong.KongPlugin, data *schema.ResourceData) error {
+			config := plugin.Config
 
-	config, err := getPluginConfig(data)
+			configJson, err := json.Marshal(config)
 
-	if err != nil {
-		return err
-	}
+			if err != nil {
+				return err
+			}
 
-	plugin, err := kongClient.CreatePlugin(&kong.KongPlugin{
-		ServiceId:  data.Get("service_id").(string),
-		RouteId:    data.Get("route_id").(string),
-		ConsumerId: data.Get("consumer_id").(string),
-		Name:       data.Get("name").(string),
-		Config:     config,
-		Enabled:    data.Get("enabled").(bool),
-	})
-
-	if err != nil {
-		return err
-	}
-
-	data.SetId(plugin.Id)
-
-	return resourceKongPluginRead(data, meta)
-}
-
-func resourceKongPluginRead(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*kong.KongClient)
-
-	plugin, err := kongClient.GetPlugin(data.Id())
-
-	if err != nil {
-		if resourceDoesNotExistError(err) {
-			data.SetId("")
+			data.Set("config_json", configJson)
+			data.Set("name", plugin.Name)
 
 			return nil
-		}
-
-		return err
-	}
-
-	data.Set("service_id", plugin.ServiceId)
-	data.Set("route_id", plugin.RouteId)
-	data.Set("consumer_id", plugin.ConsumerId)
-	data.Set("name", plugin.Name)
-	data.Set("enabled", plugin.Enabled)
-	data.Set("created_at", plugin.CreatedAt)
-
-	if data.Get("config_json").(string) != "" {
-		configJson, _ := json.Marshal(plugin.Config)
-		data.Set("config_json", string(configJson[:]))
-	} else {
-		configErr := data.Set("config", plugin.Config)
-
-		if configErr != nil {
-			// TF schema can only handle simple maps.
-			// This is mainly for plugins where the **default** config cannot be created as map[string]string
-			// For example, basic-auth has a `hide_credentials` flag, which cannot be converted to a string
-			data.SetId("")
-
-			return fmt.Errorf("%s; use the config_json field for more complex configurations; you may have to import the resource by-hand or delete and re-create using the config_json field", configErr)
-		}
-	}
-
-	return nil
-}
-
-func resourceKongPluginUpdate(data *schema.ResourceData, meta interface{}) error {
-	return nil
-}
-
-func resourceKongPluginDelete(data *schema.ResourceData, meta interface{}) error {
-	kongClient := meta.(*kong.KongClient)
-
-	return kongClient.DeletePlugin(data.Id())
-}
-
-func getPluginConfig(data *schema.ResourceData) (map[string]interface{}, error) {
-	var config map[string]interface{}
-
-	config = data.Get("config").(map[string]interface{})
-	configJson := data.Get("config_json").(string)
-
-	if len(config) != 0 {
-		return config, nil
-	}
-
-	err := json.Unmarshal([]byte(configJson), &config)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return config, nil
+		},
+	})
 }
 
 func pluginIsAResource(pluginName string) (string, bool) {

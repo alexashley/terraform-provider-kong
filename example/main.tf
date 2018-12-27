@@ -15,7 +15,8 @@ resource "kong_route" "mock" {
 
 resource "kong_plugin_request_transformer_advanced" "request-transformer-plugin-service" {
   service_id = "${kong_service.mockbin.id}"
-  add_headers = ["x-parent-resource:service"]
+  add_headers = [
+    "x-parent-resource:service"]
   http_method = "GET",
   replace_uri = "/foobar"
 }
@@ -45,7 +46,7 @@ resource "kong_route" "child-route-test-count" {
 
 variable basic-auth-foo-config {
   type = "string"
-  default =<<EOF
+  default = <<EOF
 {
   "anonymous": "",
   "hide_credentials": true
@@ -57,4 +58,11 @@ resource "kong_plugin" "basic-auth-foo" {
   route_id = "${kong_route.mock.id}"
   name = "basic-auth"
   config_json = "${var.basic-auth-foo-config}"
+}
+
+resource "kong_plugin_openid_connect" "oidc-route" {
+  route_id = "${kong_route.mock.id}"
+  auth_methods = [
+    "bearer"]
+  issuer = "https://oidc.example.com/auth/"
 }

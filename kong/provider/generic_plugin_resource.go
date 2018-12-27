@@ -1,17 +1,19 @@
 package provider
 
 import (
+	"fmt"
 	"github.com/alexashley/terraform-provider-kong/kong/kong"
-	"github.com/alexashley/terraform-provider-kong/kong/util"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-type ResourceMapper func(plugin *kong.KongPlugin, data *schema.ResourceData)
-type ConfigMapper func(data *schema.ResourceData) interface{}
+type ResourceMapper func(plugin *kong.KongPlugin, data *schema.ResourceData) error
+type ConfigMapper func(data *schema.ResourceData) (interface{}, error)
+type GetName func(data *schema.ResourceData) string
 
 type GenericPluginResource struct {
-	Name                    string
+	AllowsConsumers         bool
 	AdditionalSchema        map[string]*schema.Schema
+	Name                    GetName
 	MapSchemaToPluginConfig ConfigMapper
 	MapApiModelToResource   ResourceMapper
 }
@@ -19,29 +21,29 @@ type GenericPluginResource struct {
 var defaultPluginSchema = map[string]*schema.Schema{
 	"service_id": {
 		Description: "Unique identifier of the associated service.",
-		Type:     schema.TypeString,
-		Optional: true,
+		Type:        schema.TypeString,
+		Optional:    true,
 	},
 	"route_id": {
 		Description: "Unique identifier of the associated route.",
-		Type:     schema.TypeString,
-		Optional: true,
+		Type:        schema.TypeString,
+		Optional:    true,
 	},
 	"consumer_id": {
 		Description: "Unique identifier of the consumer for which this plugin will run. Not all plugins allow consumers",
-		Type:     schema.TypeString,
-		Optional: true,
+		Type:        schema.TypeString,
+		Optional:    true,
 	},
 	"enabled": {
 		Description: "Toggle whether the plugin will run",
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  true,
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     true,
 	},
 	"created_at": {
 		Description: "Unix timestamp representing when the plugin was created.",
-		Type:     schema.TypeInt,
-		Computed: true,
+		Type:        schema.TypeInt,
+		Computed:    true,
 	},
 }
 
@@ -54,11 +56,11 @@ func CreateGenericPluginResource(resource *GenericPluginResource) *schema.Resour
 		Importer: &schema.ResourceImporter{
 			State: importResourceIfUuidIsValid,
 		},
-		Schema: mergeSchemaWithDefaults(resource.AdditionalSchema),
+		Schema: mergeSchemaWithDefaults(resource.AdditionalSchema, resource.AllowsConsumers),
 	}
 }
 
-func mergeSchemaWithDefaults(pluginSchema map[string]*schema.Schema) map[string]*schema.Schema {
+func mergeSchemaWithDefaults(pluginSchema map[string]*schema.Schema, allowsConsumers bool) map[string]*schema.Schema {
 	mergedSchema := make(map[string]*schema.Schema)
 
 	for key, value := range defaultPluginSchema {
@@ -69,22 +71,25 @@ func mergeSchemaWithDefaults(pluginSchema map[string]*schema.Schema) map[string]
 		mergedSchema[key] = value
 	}
 
+	if !allowsConsumers {
+		delete(mergedSchema, "consumer_id")
+	}
+
 	return mergedSchema
 }
 
 func (resource *GenericPluginResource) resourceGenericPluginCreate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
-	plugin, err := kongClient.CreatePlugin(&kong.KongPlugin{
-		ServiceId:  data.Get("service_id").(string),
-		RouteId:    data.Get("route_id").(string),
-		ConsumerId: data.Get("consumer_id").(string),
-		Name:       resource.Name,
-		Enabled:    data.Get("enabled").(bool),
-		Config:     resource.MapSchemaToPluginConfig(data),
-	})
+
+	payload, err := resource.mapToApiModel(data)
 
 	if err != nil {
-		util.Log("ERROR " + err.Error())
+		return err
+	}
+
+	plugin, err := kongClient.CreatePlugin(payload)
+
+	if err != nil {
 		return err
 	}
 
@@ -109,22 +114,28 @@ func (resource *GenericPluginResource) resourceGenericPluginRead(data *schema.Re
 	}
 	data.Set("service_id", plugin.ServiceId)
 	data.Set("route_id", plugin.RouteId)
-	data.Set("consumer_id", plugin.ConsumerId)
+
+	if resource.AllowsConsumers {
+		data.Set("consumer_id", plugin.ConsumerId)
+	}
+
 	data.Set("name", plugin.Name)
 	data.Set("enabled", plugin.Enabled)
 	data.Set("created_at", plugin.CreatedAt)
 
-	resource.MapApiModelToResource(plugin, data)
-
-	return nil
+	return resource.MapApiModelToResource(plugin, data)
 }
 
 func (resource *GenericPluginResource) resourceGenericPluginUpdate(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	pluginToUpdate := resource.mapToApiModel(data)
+	pluginToUpdate, err := resource.mapToApiModel(data)
 
-	err := kongClient.UpdatePlugin(pluginToUpdate)
+	if err != nil {
+		return err
+	}
+
+	err = kongClient.UpdatePlugin(pluginToUpdate)
 
 	if err != nil {
 		return err
@@ -136,17 +147,34 @@ func (resource *GenericPluginResource) resourceGenericPluginUpdate(data *schema.
 func (resource *GenericPluginResource) resourceGenericPluginDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	return kongClient.DeletePlugin(data.Id())
+	err := kongClient.DeletePlugin(data.Id())
+
+	if resourceDoesNotExistError(err) {
+		return nil
+	}
+
+	return err
 }
 
-func (resource *GenericPluginResource) mapToApiModel(data *schema.ResourceData) *kong.KongPlugin {
-	return &kong.KongPlugin{
-		Id:         data.Id(),
-		ServiceId:  data.Get("service_id").(string),
-		RouteId:    data.Get("route_id").(string),
-		ConsumerId: data.Get("consumer_id").(string),
-		Name:       resource.Name,
-		Enabled:    data.Get("enabled").(bool),
-		Config:     resource.MapSchemaToPluginConfig(data),
+func (resource *GenericPluginResource) mapToApiModel(data *schema.ResourceData) (*kong.KongPlugin, error) {
+	config, err := resource.MapSchemaToPluginConfig(data)
+
+	if err != nil {
+		return nil, fmt.Errorf("error mapping TF resource to API model: %s", err)
 	}
+
+	plugin := kong.KongPlugin{
+		Id:        data.Id(),
+		ServiceId: data.Get("service_id").(string),
+		RouteId:   data.Get("route_id").(string),
+		Name:      resource.Name(data),
+		Enabled:   data.Get("enabled").(bool),
+		Config:    config,
+	}
+
+	if resource.AllowsConsumers {
+		plugin.ConsumerId = data.Get("consumer_id").(string)
+	}
+
+	return &plugin, nil
 }

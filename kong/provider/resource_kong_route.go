@@ -32,7 +32,7 @@ func resourceKongRoute() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"protocols": {
 				Description: "Protocols that Kong will proxy to this route",
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -44,7 +44,7 @@ func resourceKongRoute() *schema.Resource {
 			},
 			"methods": {
 				Description: "HTTP verbs that Kong will proxy to this route",
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -52,7 +52,7 @@ func resourceKongRoute() *schema.Resource {
 			},
 			"hosts": {
 				Description: "Host header values that should be matched to this route.",
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -60,7 +60,7 @@ func resourceKongRoute() *schema.Resource {
 			},
 			"paths": {
 				Description: "List of path prefixes that will match this route",
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
@@ -68,36 +68,36 @@ func resourceKongRoute() *schema.Resource {
 			},
 			"strip_path": {
 				Description: " If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request.",
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 			"preserve_host": {
 				Description: " If the route is matched by the `Host` header, this flag indicates if the `Host` header should be set to the matched value.",
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"service_id": {
 				Description: "Unique identifier of the associated service.",
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"created_at": {
 				Description: "Unix timestamp of creation date.",
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"updated_at": {
 				Description: "Unix timestamp of last edit date.",
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"regex_priority": {
 				Description: "Determines the order that paths defined by regexes are evaluated.",
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  0,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
 			},
 		},
 	}
@@ -165,7 +165,13 @@ func resourceKongRouteUpdate(data *schema.ResourceData, meta interface{}) error 
 func resourceKongRouteDelete(data *schema.ResourceData, meta interface{}) error {
 	kongClient := meta.(*kong.KongClient)
 
-	return kongClient.DeleteRoute(data.Id())
+	err := kongClient.DeleteRoute(data.Id())
+
+	if resourceDoesNotExistError(err) {
+		return nil
+	}
+
+	return err
 }
 
 func mapToApiRoute(data *schema.ResourceData) *kong.KongRoute {
@@ -188,21 +194,21 @@ func validateRouteResource(data *schema.ResourceData) error {
 	invalidProtocols, _ := filterBySet(protocols, supportedProtocols)
 
 	if len(invalidProtocols) > 0 {
-		return fmt.Errorf("The supplied protocols are not supported by Kong: %s", strings.Join(invalidProtocols, ", "))
+		return fmt.Errorf("the supplied protocols are not supported by Kong: %s", strings.Join(invalidProtocols, ", "))
 	}
 	methods := data.Get("methods").([]interface{})
 
 	invalidMethods, _ := filterBySet(methods, supportedMethods)
 
 	if len(invalidMethods) > 0 {
-		return fmt.Errorf("Invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))
+		return fmt.Errorf("invalid HTTP methods: %s", strings.Join(invalidMethods, ", "))
 	}
 
 	paths := data.Get("paths").([]interface{})
 	hosts := data.Get("hosts").([]interface{})
 
 	if len(paths) == 0 && len(hosts) == 0 && len(methods) == 0 {
-		return fmt.Errorf("At least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route.")
+		return fmt.Errorf("at least one of methods, paths, or hosts must be set in order for Kong to proxy traffic to this route")
 	}
 
 	return nil

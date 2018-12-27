@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
 )
 
@@ -19,14 +20,14 @@ func filterBySet(input interface{}, valid []string) ([]string, error) {
 	inputSlice, ok := input.([]interface{})
 
 	if !ok {
-		return nil, fmt.Errorf("Input is not a slice")
+		return nil, fmt.Errorf("input is not a slice")
 	}
 
 	for i := range inputSlice {
 		member, ok := inputSlice[i].(string)
 
 		if !ok {
-			return nil, fmt.Errorf("Input slice doesn't contain strings")
+			return nil, fmt.Errorf("input slice doesn't contain strings")
 		}
 
 		match := false
@@ -45,4 +46,34 @@ func filterBySet(input interface{}, valid []string) ([]string, error) {
 	}
 
 	return invalidMembers, nil
+}
+
+func validateUrl(value interface{}, key string) (warnings []string, errors []error) {
+	input, ok := value.(string)
+
+	if !ok {
+		errors = append(errors, fmt.Errorf("expected %s to be a string", key))
+		return warnings, errors
+	}
+
+	if _, err := url.ParseRequestURI(input); err != nil {
+		errors = append(errors, fmt.Errorf("error parsing url \"%s\": %s", input, err))
+	}
+
+	return warnings, errors
+}
+
+func validateUuid(value interface{}, key string) (warnings []string, errors []error) {
+	input, ok := value.(string)
+
+	if !ok {
+		errors = append(errors, fmt.Errorf("expected %s to be a string", key))
+		return warnings, errors
+	}
+
+	if !isValidUuid(input) {
+		errors = append(errors, fmt.Errorf("%s is not a valid UUID", input))
+	}
+
+	return warnings, errors
 }

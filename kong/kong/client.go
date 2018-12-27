@@ -35,7 +35,7 @@ func NewKongClient(config KongConfig) (*KongClient, error) {
 	status, err := client.GetStatus()
 
 	if err != nil {
-		return nil, fmt.Errorf("error initializing Kong client: %e", err)
+		return nil, fmt.Errorf("error initializing Kong client: %s", err)
 	}
 
 	if !status.Database.Reachable {
