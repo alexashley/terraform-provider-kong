@@ -5,8 +5,8 @@ A representation of Kong's [service object](https://docs.konghq.com/0.14.x/admin
 
 ```hcl
 resource "kong_service" "mockbin" {
-  name = "mockbin"
-  url = "https://mockbin.org/request"
+  name  = "mockbin"
+  url   = "https://mockbin.org/request"
 }
 
 ```

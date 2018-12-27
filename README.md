@@ -4,7 +4,7 @@
 A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
 - [example](/example/main.tf)
-- [documentation](/docs/index.md)
+- [documentation](https://alexashley.github.io/terraform-provider-kong/)
 
 ## Features
 

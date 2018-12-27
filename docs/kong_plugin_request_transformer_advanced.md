@@ -5,7 +5,7 @@ A resource for the [`request-transformer-advanced`](https://docs.konghq.com/hub/
 
 ```hcl
 resource  "kong_plugin_request_transformer_advanced" "request-transformer-plugin-service" {
-  service_id = "${kong_service.mockbin.id}"
+  service_id  = "${kong_service.mockbin.id}"
   add_headers = ["x-parent-resource:service"]
   http_method = "GET",
   replace_uri = "/foobar"

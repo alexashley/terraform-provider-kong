@@ -3,9 +3,9 @@ description: |
   Due to the complexity of the plugin, only a subset of the functionality is currently exposed; for example, it cannot be configured as a relying party.
 example: |
   resource "kong_plugin_openid_connect" "oidc-route" {
-    route_id = "${kong_route.mock.id}"
-    auth_methods = ["bearer"]
-    issuer = "https://oidc.example.com/auth/"
+    route_id      = "${kong_route.mock.id}"
+    auth_methods  = ["bearer"]
+    issuer        = "https://oidc.example.com/auth/"
   }
 import: |
   Existing plugins can be imported: `terraform import kong_plugin_openid_connect <plugin UUID>`

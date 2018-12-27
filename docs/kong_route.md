@@ -8,8 +8,8 @@ For more information on `regex_priority`, see the [Kong docs](https://docs.kongh
 
 ```hcl
 resource "kong_route" "mock" {
-  service_id = "${kong_service.mockbin.id}"
-  paths = ["/mock"]
+  service_id  = "${kong_service.mockbin.id}"
+  paths       = ["/mock"]
 }
 
 ```

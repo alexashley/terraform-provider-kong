@@ -23,8 +23,7 @@ The following fields are supported:
 
 
 ### Import
-Existing Kong consumers can also be imported into Terraform state
-Example:
+Existing Kong consumers can also be imported into Terraform state:
  ```bash
   terraform import kong_consumer.crocodile-hunter <consumer UUID>
 ```

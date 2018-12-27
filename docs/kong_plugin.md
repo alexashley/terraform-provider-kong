@@ -11,9 +11,9 @@ Note that if you use the `config_json` field you'll need to provide the full plu
 
 ```hcl
 resource "kong_plugin" "basic-auth-plugin" {
-  route_id = "${kong_route.foo-route.id}"
-  name = "basic-auth"
-  config_json = <<EOF
+  route_id      = "${kong_route.foo-route.id}"
+  name          = "basic-auth"
+  config_json   = <<EOF
   {
     "anonymous": "",
     "hide_credentials": true

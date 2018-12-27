@@ -6,9 +6,9 @@ Due to the complexity of the plugin, only a subset of the functionality is curre
 
 ```hcl
 resource "kong_plugin_openid_connect" "oidc-route" {
-  route_id = "${kong_route.mock.id}"
-  auth_methods = ["bearer"]
-  issuer = "https://oidc.example.com/auth/"
+  route_id      = "${kong_route.mock.id}"
+  auth_methods  = ["bearer"]
+  issuer        = "https://oidc.example.com/auth/"
 }
 
 ```
