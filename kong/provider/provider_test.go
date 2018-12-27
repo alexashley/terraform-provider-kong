@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"os"
@@ -32,4 +33,16 @@ func testAccPreCheck(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestMain(m *testing.M) {
+	exitCode := m.Run()
+	if exitCode == 0 && testing.CoverMode() != "" {
+		c := testing.Coverage()
+		if c < 0.59 {
+			fmt.Println("Coverage failure: ", c)
+			exitCode = -1
+		}
+	}
+	os.Exit(exitCode)
 }
