@@ -16,6 +16,7 @@ const (
 	GenDir               = "docsgen"
 	ResourceTemplateFile = "resource.tmpl"
 	IndexTemplateFile    = "index.tmpl"
+	SourceUrl            = "https://github.com/alexashley/terraform-provider-kong/tree/master/kong/provider"
 )
 
 type Attribute struct {
@@ -33,6 +34,7 @@ type Resource struct {
 
 	UserProvidedAttributes []Attribute
 	ComputedAttributes     []Attribute
+	Src                    string
 }
 
 type ResourceMetadata struct {
@@ -90,13 +92,13 @@ func mapAttributeType(attribute *schema.Schema) string {
 
 func mapDefaultValue(defaultValue interface{}) interface{} {
 	if defaultValue == nil {
-		return "N/A"
+		return ""
 	}
 
 	return defaultValue
 }
 
-func attributeSorter(attributes []Attribute) (func(i, j int) bool) {
+func attributeSorter(attributes []Attribute) func(i, j int) bool {
 	return func(i, j int) bool {
 		a1 := attributes[i]
 		a2 := attributes[j]
@@ -146,6 +148,8 @@ func readResourcesFromProvider() (resources []Resource, warnings []string) {
 				resource.ComputedAttributes = append(resource.ComputedAttributes, attribute)
 			}
 		}
+		resource.Src = fmt.Sprintf("%s/resource_%s.go", SourceUrl, terraformResourceName)
+
 		sort.Slice(resource.UserProvidedAttributes, attributeSorter(resource.UserProvidedAttributes))
 		sort.Slice(resource.ComputedAttributes, attributeSorter(resource.ComputedAttributes))
 
@@ -198,7 +202,7 @@ func generateDocs(resources []Resource) error {
 		index.Resources = append(index.Resources, r.Name)
 	}
 
-	sort.Slice(index.Resources, func(i,j int) bool {
+	sort.Slice(index.Resources, func(i, j int) bool {
 		return index.Resources[i] < index.Resources[j]
 	})
 	indexFile, err := os.Create(fmt.Sprintf("%s/index.md", OutputDir))

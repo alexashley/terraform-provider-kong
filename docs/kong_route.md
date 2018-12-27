@@ -1,4 +1,4 @@
-# kong_route
+# [kong_route](https://github.com/alexashley/terraform-provider-kong/tree/master/kong/provider/resource_kong_route.go)
 A representation of Kong's [route object](https://docs.konghq.com/0.14.x/admin-api/#route-object).
 Services can have many routes, but a route corresponds to just one service.
 
@@ -6,13 +6,18 @@ For more information on `regex_priority`, see the [Kong docs](https://docs.kongh
 
 ### Example usage
 
-```hcl
+~~~hcl
 resource "kong_route" "mock" {
   service_id  = "${kong_service.mockbin.id}"
   paths       = ["/mock"]
 }
+~~~
 
-```
+~~~js
+const a = async () => Promise.resolve('a');
+
+console.log(await a());
+~~~
 
 ### Fields Reference
 The following fields are supported:
@@ -20,12 +25,12 @@ The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
-|`service_id`|Unique identifier of the associated service. |`string`| N/A| Y|
-|`hosts`|Host header values that should be matched to this route. |`set[string]`| N/A| N|
-|`methods`|HTTP verbs that Kong will proxy to this route |`set[string]`| N/A| N|
-|`paths`|List of path prefixes that will match this route |`set[string]`| N/A| N|
+|`service_id`|Unique identifier of the associated service. |`string`| | Y|
+|`hosts`|Host header values that should be matched to this route. |`set[string]`| | N|
+|`methods`|HTTP verbs that Kong will proxy to this route |`set[string]`| | N|
+|`paths`|List of path prefixes that will match this route |`set[string]`| | N|
 |`preserve_host`| If the route is matched by the `Host` header, this flag indicates if the `Host` header should be set to the matched value. |`bool`| false| N|
-|`protocols`|Protocols that Kong will proxy to this route |`set[string]`| N/A| N|
+|`protocols`|Protocols that Kong will proxy to this route |`set[string]`| | N|
 |`regex_priority`|Determines the order that paths defined by regexes are evaluated. |`int`| 0| N|
 |`strip_path`| If the route is matched by path, this flag indicates whether the matched path should be removed from the upstream request. |`bool`| true| N|
 
@@ -41,3 +46,5 @@ The following computed attributes are also available:
 ### Import
 Existing Kong routes can be imported into Terraform:
 `terraform import kong_route.name-of-route-to-import <route UUID>`
+
+[GitHub](https://github.com/alexashley/terraform-provider-kong)

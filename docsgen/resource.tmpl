@@ -1,10 +1,15 @@
-{{ define "base" }}# {{ .Resource.Name }}
+{{ define "base" }}# [{{ .Resource.Name }}]({{ .Resource.Src}})
 {{ .Meta.Description }}
 ### Example usage
 
-```hcl
-{{ .Meta.Example }}
-```
+~~~hcl
+{{ .Meta.Example }}~~~
+
+~~~js
+const a = async () => Promise.resolve('a');
+
+console.log(await a());
+~~~
 
 ### Fields Reference
 The following fields are supported:
@@ -23,4 +28,6 @@ The following computed attributes are also available:
 |`{{.Name}}`|{{.Description}} |{{.Type}}|{{ end }}{{end}}
 {{ if .Resource.CanImport }}
 ### Import
-{{ .Meta.Import }}{{ end }}{{ end }}
+{{ .Meta.Import }}{{ end }}
+[GitHub](https://github.com/alexashley/terraform-provider-kong)
+{{ end }}

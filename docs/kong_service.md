@@ -1,15 +1,20 @@
-# kong_service
+# [kong_service](https://github.com/alexashley/terraform-provider-kong/tree/master/kong/provider/resource_kong_service.go)
 A representation of Kong's [service object](https://docs.konghq.com/0.14.x/admin-api/#service-object)
 
 ### Example usage
 
-```hcl
+~~~hcl
 resource "kong_service" "mockbin" {
   name  = "mockbin"
   url   = "https://mockbin.org/request"
 }
+~~~
 
-```
+~~~js
+const a = async () => Promise.resolve('a');
+
+console.log(await a());
+~~~
 
 ### Fields Reference
 The following fields are supported:
@@ -17,8 +22,8 @@ The following fields are supported:
 
 | field     | explanation     | type      | default     | required                         |
 | :-------- | :-------------- | :-------- | :---------- | :------------------------------- |
-|`name`|The service name. |`string`| N/A| Y|
-|`url`|The url for the service. It encapsulates protocol, host, port and path |`string`| N/A| Y|
+|`name`|The service name. |`string`| | Y|
+|`url`|The url for the service. It encapsulates protocol, host, port and path |`string`| | Y|
 |`connect_timeout`|Time in milliseconds to connect to the upstream server. |`int`| 60000| N|
 |`read_timeout`|Time in milliseconds between two read operations to the upstream server. |`int`| 60000| N|
 |`retries`|Number of times Kong will try to proxy if there's an error. |`int`| 5| N|
@@ -38,3 +43,5 @@ Existing Kong services can be imported:
 ```bash
 terraform import kong_service.name-of-service-to-import <service UUID>
 ```
+
+[GitHub](https://github.com/alexashley/terraform-provider-kong)

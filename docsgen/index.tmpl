@@ -1,14 +1,16 @@
 {{ define "index" }}# {{ .Title }}
 
 ## Provider
-```hcl
+~~~hcl
 provider "kong" {
   admin_api_url = "http://localhost:8001"
-  rbac_token = "foobar"
+  rbac_token    = "foobar"
 }
-```
+~~~
 
 ## Resources
 {{ range $r := .Resources}}
 - [`{{$r}}`](https://alexashley.github.io/terraform-provider-kong/{{$r}}){{end}}
+
+[GitHub](https://github.com/alexashley/terraform-provider-kong)
 {{end}}

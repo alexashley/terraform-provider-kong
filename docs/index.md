@@ -1,12 +1,12 @@
 # `terraform-provider-kong`
 
 ## Provider
-```hcl
+~~~hcl
 provider "kong" {
   admin_api_url = "http://localhost:8001"
-  rbac_token = "foobar"
+  rbac_token    = "foobar"
 }
-```
+~~~
 
 ## Resources
 
@@ -16,3 +16,5 @@ provider "kong" {
 - [`kong_plugin_request_transformer_advanced`](https://alexashley.github.io/terraform-provider-kong/kong_plugin_request_transformer_advanced)
 - [`kong_route`](https://alexashley.github.io/terraform-provider-kong/kong_route)
 - [`kong_service`](https://alexashley.github.io/terraform-provider-kong/kong_service)
+
+[GitHub](https://github.com/alexashley/terraform-provider-kong)
