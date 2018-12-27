@@ -8,11 +8,16 @@ provider "kong" {
 }
 ```
 
+```js
+const test = async () => Promise.resolve('foo');
+console.log(await test());
+```
+
 ## Resources
 
-- [`kong_consumer`](/docs/kong_consumer.md)
-- [`kong_plugin`](/docs/kong_plugin.md)
-- [`kong_plugin_openid_connect`](/docs/kong_plugin_openid_connect.md)
-- [`kong_plugin_request_transformer_advanced`](/docs/kong_plugin_request_transformer_advanced.md)
-- [`kong_route`](/docs/kong_route.md)
-- [`kong_service`](/docs/kong_service.md)
+- [`kong_consumer`](https://alexashley.github.io/terraform-provider-kong/kong_consumer)
+- [`kong_plugin`](https://alexashley.github.io/terraform-provider-kong/kong_plugin)
+- [`kong_plugin_openid_connect`](https://alexashley.github.io/terraform-provider-kong/kong_plugin_openid_connect)
+- [`kong_plugin_request_transformer_advanced`](https://alexashley.github.io/terraform-provider-kong/kong_plugin_request_transformer_advanced)
+- [`kong_route`](https://alexashley.github.io/terraform-provider-kong/kong_route)
+- [`kong_service`](https://alexashley.github.io/terraform-provider-kong/kong_service)
