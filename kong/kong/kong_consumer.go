@@ -1,5 +1,7 @@
 package kong
 
+import "strings"
+
 const consumerPath = "/consumers"
 
 func singleConsumer(consumerId string) string {
@@ -35,4 +37,29 @@ func (kongClient *KongClient) DeleteConsumer(consumerId string) error {
 
 func (kongClient *KongClient) UpdateConsumer(consumerToUpdate *KongConsumer) error {
 	return kongClient.put(singleConsumer(consumerToUpdate.Id), consumerToUpdate)
+}
+
+func (kongClient *KongClient) GetConsumers() ([]KongConsumer, error) {
+	var page KongConsumerPage
+	var plugins []KongConsumer
+
+	for {
+		url := consumerPath
+
+		if page.Next != "" {
+			url = strings.Replace(page.Next, kongClient.Config.AdminApiUrl, "", 1)
+		}
+
+		if err := kongClient.get(url, &page); err != nil {
+			return nil, err
+		}
+
+		plugins = append(plugins, page.Data...)
+
+		if page.Next == "" {
+			break
+		}
+	}
+
+	return plugins, nil
 }

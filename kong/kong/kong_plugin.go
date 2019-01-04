@@ -35,9 +35,9 @@ func (kongClient *KongClient) UpdatePlugin(pluginToUpdate *KongPlugin) error {
 	return kongClient.patch(pluginPath+"/"+pluginToUpdate.Id, pluginToUpdate)
 }
 
-func (kongClient *KongClient) GetPlugins() ([]KongRoute, error) {
+func (kongClient *KongClient) GetPlugins() ([]KongPlugin, error) {
 	var page KongPluginsPage
-	var plugins []KongRoute
+	var plugins []KongPlugin
 
 	for {
 		url := pluginPath

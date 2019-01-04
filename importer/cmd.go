@@ -1,4 +1,4 @@
-package importer
+package main
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"os"
 )
 
-func RunCli() {
+func main() {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
-	subcommands.Register(&generateCommand{}, "")
+	subcommands.Register(&importCommand{}, "")
 
 	flag.Parse()
 	ctx := context.Background()

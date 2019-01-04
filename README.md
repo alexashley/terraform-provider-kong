@@ -3,7 +3,7 @@
 
 A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 
-- [example](/example/main.tf)
+- [example](/examples/simple/main.tf)
 - [documentation](https://alexashley.github.io/terraform-provider-kong/)
 
 ## Features
@@ -11,7 +11,7 @@ A Terraform provider for the api gateway [Kong](https://github.com/Kong/kong).
 - Supports Kong's Enterprise authentication
 - Resources for individual plugins, including EE-only plugins 
 - Import individual consumers, services, routes, or plugins
-- [WIP] Bulk import tool to ease migrating existing infrastructure into Terraform 
+- [Bulk import tool](./importer/README.md) to ease migrating existing infrastructure into Terraform
 
 ## Unsupported Resources
 

@@ -60,8 +60,13 @@ type KongRoutesPage struct {
 }
 
 type KongPluginsPage struct {
-	Next string      `json:"next,omitempty"`
-	Data []KongRoute `json:"data"`
+	Next string       `json:"next,omitempty"`
+	Data []KongPlugin `json:"data"`
+}
+
+type KongConsumerPage struct {
+	Next string `json:"next,omitempty"`
+	Data []KongConsumer
 }
 
 type KongDatabaseStatus struct {

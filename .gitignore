@@ -10,3 +10,5 @@ example/.terraform
 terraform.tfstate
 terraform.tfstate.backup
 docsgen/docsgen
+importer/kong-import
+import-state.json

@@ -1,5 +1,5 @@
-.PHONY: build example testacc clean-docs build-docs docs coverageacc docker-image docker-push
-.ONESHELL: build-docs
+.PHONY: build example testacc clean-docs build-docs docs coverageacc docker-image docker-push import build-import
+.ONESHELL: build-docs build-import
 MAKEFLAGS += --silent
 
 KONG ?= "http://localhost:8001"
@@ -16,10 +16,10 @@ testapi:
 	go test ./kong/kong -v
 
 example: build
-	terraform init example
-	terraform destroy example
-	terraform apply example
-	terraform plan example
+	terraform init examples/simple
+	terraform destroy examples/simple
+	terraform apply examples/simple
+	terraform plan examples/simple
 
 clean-docs:
 	rm -rf docs/*.md
@@ -42,3 +42,15 @@ docker-image:
 
 docker-push:
 	docker push alexashley/tf-provider-custom-kong:${IMAGE_VERSION}
+
+build-import:
+	cd importer
+	go build -o kong-import
+
+import: build-import
+	rm -f import-state.json
+	terraform init examples/import
+	terraform destroy examples/import
+	./examples/import/create-resources-to-import.sh
+	./importer/kong-import import -admin-api-url=http://localhost:8001 -tf-config=examples/import
+	terraform plan examples/import
