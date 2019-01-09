@@ -21,6 +21,7 @@ The following fields are supported:
 |`issuer`|URL of the OpenId Connect server |`string`| | Y|
 |`anonymous`|Anonymous consumer id. This is useful if you need to enable multiple auth plugins -- failing to authenticate will cause this consumer to be set. |`string`| | N|
 |`auth_methods`|Allowed authentication methods |`set[string]`| | N|
+|`consumer_by`|A JWT claim used to lookup a Kong consumer. Used with consumer_claim to control the process of identifying a Kong consumer. |`set[string]`| | N|
 |`consumer_claim`|JWT claims to use to map to a Kong consumer. Typically set to `sub` |`set[string]`| | N|
 |`enabled`|Toggle whether the plugin will run |`bool`| true| N|
 |`route_id`|Unique identifier of the associated route. |`string`| | N|

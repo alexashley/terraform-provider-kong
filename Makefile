@@ -4,7 +4,7 @@ MAKEFLAGS += --silent
 
 KONG ?= "http://localhost:8001"
 
-IMAGE_VERSION="0.0.6"
+IMAGE_VERSION="0.0.7"
 
 build:
 	 GO111MODULE=on go build -o terraform-provider-kong

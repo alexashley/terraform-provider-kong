@@ -113,6 +113,27 @@ func TestAccKongPluginOpenIdConnect_validate_auth_methods(t *testing.T) {
 	})
 }
 
+func TestAccKongPluginOpenIdConnect_validate_consumer_by(t *testing.T) {
+	issuer := fmt.Sprintf("https://%s.com", acctest.RandString(10))
+	consumerBy := acctest.RandString(10)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: test_util.TestAccCheckGenericKongPluginDestroy(
+			testAccProvider,
+			"kong_plugin_openid_connect",
+			"kong_plugin_openid_connect.oidc-test",
+			"openid-connect"),
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccKongPluginOpenIdConnect_consumer_by(issuer, consumerBy),
+				ExpectError: regexp.MustCompile("invalid value for consumer_by: must be one of custom_id or username"),
+			},
+		},
+	})
+}
+
 func testAccKongPluginOpenIdConnect_basic(issuer string) string {
 	return fmt.Sprintf(`
 	resource "kong_service" "test-service" {
@@ -159,4 +180,20 @@ func testAccKongPluginOpenIdConnect_auth(issuer, authMethod string) string {
 		auth_methods 	= ["%s"]
 	}
 `, acctest.RandString(5), issuer, authMethod)
+}
+
+func testAccKongPluginOpenIdConnect_consumer_by(issuer, consumerBy string) string {
+	return fmt.Sprintf(`
+	resource "kong_service" "test-service" {
+		name	= "mockbin-%s"
+		url		= "https://mockbin.org/request"
+	}
+
+	resource "kong_plugin_openid_connect" "oidc-test" {
+		service_id		= "${kong_service.test-service.id}"
+		issuer 			= "%s"
+		consumer_by 	= ["%s"]
+		
+	}
+`, acctest.RandString(5), issuer, consumerBy)
 }

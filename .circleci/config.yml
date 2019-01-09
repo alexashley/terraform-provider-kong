@@ -9,7 +9,7 @@ jobs:
       environment:
       - POSTGRES_USER=kong
       - POSTGRES_DB=kong
-    - image: alexashley/tf-provider-custom-kong:0.0.6
+    - image: alexashley/tf-provider-custom-kong:0.0.7
       environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=localhost

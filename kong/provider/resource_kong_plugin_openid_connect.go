@@ -28,6 +28,15 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 				},
 				Set: schema.HashString,
 			},
+			"consumer_by": {
+				Description: "A JWT claim used to lookup a Kong consumer. Used with consumer_claim to control the process of identifying a Kong consumer.",
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Set: schema.HashString,
+			},
 			"consumer_claim": {
 				Description: "JWT claims to use to map to a Kong consumer. Typically set to `sub`",
 				Type:        schema.TypeSet,
@@ -63,6 +72,15 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 				}
 
 				config["auth_methods"] = methods
+			}
+
+			if consumerBys, ok := data.GetOk("consumer_by"); ok {
+				consumerBy := setToStringArray(consumerBys.(*schema.Set))
+				if err := validateConsumerBy(consumerBy); err != nil {
+					return nil, err
+				}
+
+				config["consumer_by"] = consumerBy
 			}
 
 			return config, nil
@@ -107,6 +125,16 @@ func validateAuthMethods(authMethods []string) error {
 		}
 		if !match {
 			return fmt.Errorf("%s is not a valid auth_method", method)
+		}
+	}
+
+	return nil
+}
+
+func validateConsumerBy(consumerByFields []string) error {
+	for _, consumerBy := range consumerByFields {
+		if !(consumerBy == "username" || consumerBy == "consumer") {
+			return fmt.Errorf("invalid value for consumer_by: must be one of custom_id or username")
 		}
 	}
 
