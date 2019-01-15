@@ -90,7 +90,7 @@ func resourceKongPluginOpenidConnect() *schema.Resource {
 
 			data.Set("issuer", config["issuer"])
 
-			optionals := []string{"anonymous", "auth_methods", "consumer_claim"}
+			optionals := []string{"anonymous", "auth_methods", "consumer_claim", "consumer_by"}
 
 			for _, attribute := range optionals {
 				if attributeValue, ok := config[attribute]; ok {

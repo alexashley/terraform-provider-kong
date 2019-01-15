@@ -31,6 +31,7 @@ func TestAccKongPluginOpenIdConnect_basic_update(t *testing.T) {
 					resource.TestCheckResourceAttr("kong_plugin_openid_connect.oidc-test", "auth_methods.#", "1"),
 					test_util.AssertValueInTerraformSet("kong_plugin_openid_connect.oidc-test", "auth_methods", "bearer"),
 					resource.TestCheckResourceAttr("kong_plugin_openid_connect.oidc-test", "consumer_claim.#", "1"),
+					resource.TestCheckResourceAttr("kong_plugin_openid_connect.oidc-test", "consumer_by.#", "1"),
 					test_util.AssertValueInTerraformSet("kong_plugin_openid_connect.oidc-test", "consumer_claim", "sub"),
 					resource.TestCheckResourceAttrSet("kong_plugin_openid_connect.oidc-test", "service_id"),
 				),
@@ -146,6 +147,7 @@ func testAccKongPluginOpenIdConnect_basic(issuer string) string {
 		issuer 			= "%s"
 		auth_methods 	= ["bearer"]
 		consumer_claim	= ["sub"]
+		consumer_by		= ["username"]
 	}
 `, acctest.RandString(5), issuer)
 }
@@ -162,6 +164,7 @@ func testAccKongPluginOpenIdConnect_anonymous(issuer, anonymous string) string {
 		issuer 			= "%s"
 		auth_methods 	= ["bearer"]
 		consumer_claim	= ["sub"]
+		consumer_by		= ["username"]
 		anonymous		= "%s"
 	}
 `, acctest.RandString(5), issuer, anonymous)

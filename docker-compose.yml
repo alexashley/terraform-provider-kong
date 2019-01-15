@@ -7,7 +7,7 @@ services:
     - POSTGRES_USER=kong
     - POSTGRES_DB=kong
   kong:
-    image: alexashley/tf-provider-custom-kong:0.0.6
+    image: alexashley/tf-provider-custom-kong:0.0.7
     container_name: kong
     depends_on:
     - kong-database
